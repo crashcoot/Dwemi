@@ -10,6 +10,8 @@ To run:
 TODO:
       
     -Change to Express
+    
+    -Make canvas scale
   
   
   
