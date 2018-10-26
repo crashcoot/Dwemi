@@ -153,7 +153,7 @@ function destinationReached() {
 
 
 
-console.log("Server Running at PORT: 3000  CNTL-C to quit")
+console.log("Server Running at PORT: 8080  CNTL-C to quit")
 console.log("To Test:")
 console.log("Open several browsers at: http://localhost:8080/dwemi.html")
 
