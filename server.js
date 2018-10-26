@@ -86,6 +86,8 @@ io.on("connection", socket => {
   }
   sockets[socket.id] = socket;
   interval = setInterval(() => dwemiUpdate(sockets), 10);
+  socket.on('feed', () => {upJoy()});
+  socket.on('joy', () => {upFood()});
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     delete sockets[socket.id];
@@ -103,8 +105,8 @@ dwemi.pause = false;
 dwemi.pauseLength;
 dwemi.pauseStart;
 
-dwemi.hunger = 50;
-dwemi.joy = 50;
+dwemi.hunger = 1000;
+dwemi.joy = 1000;
 
 let time = new Date().getTime();
 let timedif = 0
@@ -117,18 +119,23 @@ function dwemiUpdate(sockets) {
   time = new Date().getTime();
   //console.log(timedif);
 
-  if (!dwemi.pause) {
-    dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
-      //All cases where dwemi needs to stop and move the other direction
-      if (dwemi.dx <= 0 || dwemi.dx >= canvas.width-180) {
-        destinationReached()
-      }
-      if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || (dwemi.direction == -1 && dwemi.dx < dwemi.destination) || (dwemi.dx > canvas.width*2 || dwemi.dx < -200)) {
-        destinationReached()
-      }
-  } else {
-    checkPause();
+  updateHunger(timedif)
+  updateJoy(timedif);
+  if (dwemi.hunger > 1 || dwemi.joy > 1) {
+    if (!dwemi.pause) {
+      dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
+        //All cases where dwemi needs to stop and move the other direction
+        if (dwemi.dx <= 0 || dwemi.dx >= canvas.width-180) {
+          destinationReached()
+        }
+        if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || (dwemi.direction == -1 && dwemi.dx < dwemi.destination) || (dwemi.dx > canvas.width*2 || dwemi.dx < -200)) {
+          destinationReached()
+        }
+    } else {
+      checkPause();
+    }
   }
+  
   dwemiDataEmit(sockets)
 
 }
@@ -154,6 +161,42 @@ function destinationReached() {
   dwemi.pauseStart = new Date().getTime();
   dwemi.pauseLength = getRandomArbitrary(200, 1500);
 }
+
+function updateHunger(dif) {
+  if (dwemi.hunger >= 1) {
+    dwemi.hunger -= (dif/100);
+  }
+  if (dwemi.hunger < 1) {
+    dwemi.hunger == 0;
+  }
+  //console.log(dwemi.hunger);
+}
+
+function updateJoy(dif) {
+  if (dwemi.joy >= 1) {
+    dwemi.joy -= (dif/100);
+  }
+  if (dwemi.joy < 1) {
+    dwemi.joy == 0;
+  }
+}
+
+function upFood() {
+  if (dwemi.hunger+10 >= 1000) {
+    dwemi.hunger = 1000;
+  } else if (dwemi.hunger < 1000) {
+    dwemi.hunger += 10;
+  }
+}
+
+function upJoy() {
+  if (dwemi.joy+10 >= 1000) {
+    dwemi.joy = 1000;
+  } else if (dwemi.joy < 1000) {
+    dwemi.joy += 10;
+  }
+}
+
 
 
 

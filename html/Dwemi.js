@@ -53,11 +53,11 @@ function drawCanvas() {
   context.fillRect(0, 0, canvas.width, canvas.height); //erase canvas
 
   context.drawImage(foodImage, 20, 20)
-  context.fillStyle = "green";
-  context.fillRect(90, 25, hungerBar.filled*5, 30)
-  context.drawImage(joyImage, 20, 70)
   context.fillStyle = "orange";
-  context.fillRect(90, 80, joyBar.filled*5, 30)
+  context.fillRect(90, 25, hungerBar.filled, 30)
+  context.drawImage(joyImage, 20, 70)
+  context.fillStyle = "green";
+  context.fillRect(90, 80, joyBar.filled, 30)
   context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
   console.log(dwemi.dx)
 }
@@ -72,11 +72,11 @@ function loop(timestamp) {
 }
 
 function feedButton() {
-
+  socket.emit('feed');
 }
 
 function joyButton() {
-
+  socket.emit('joy');
 }
 
 
