@@ -7,8 +7,6 @@ To run:
   
   
 TODO:
-
-  -Create pause functionality (Have Dwemi not move)
   
   -Add weight to deciding between moving left or right based on distance from center
   
