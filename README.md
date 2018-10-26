@@ -7,7 +7,10 @@ To run:
   
   
 TODO:
+
   -Make movement be based on time, not cycles
+  
   -Have Dwemi pause in between movements
+  
   -Add weight to deciding between moving left or right based on distance from center
   
