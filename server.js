@@ -92,6 +92,7 @@ io.on("connection", socket => {
   });
 });
 
+const canvas = {width: 1200, height: 600}
 var dwemi = {dw: 150, dh: 272, dx: 500, dy: 320};
 dwemi.state = "wander";
 dwemi.direction = 1
@@ -105,7 +106,6 @@ let time = new Date().getTime();
 let timedif = 0
 //console.log(time)
 
-const canvas = {width: 1200, height: 600}
 
 function dwemiUpdate(sockets) {
   
@@ -146,7 +146,7 @@ function destinationReached() {
   dwemi.destination = getWanderDestination();
   dwemi.pause = true;
   dwemi.pauseStart = new Date().getTime();
-  dwemi.pauseLength = getRandomArbitrary(500, 1500);
+  dwemi.pauseLength = getRandomArbitrary(200, 1500);
 }
 
 
@@ -157,9 +157,17 @@ console.log("Server Running at PORT: 3000  CNTL-C to quit")
 console.log("To Test:")
 console.log("Open several browsers at: http://localhost:3000/dwemi.html")
 
+function pickDirection() {
+  let percentFromCenter = Math.floor(Math.abs(canvas.width/2 - dwemi.dx)/(canvas.width/2)*100);
+  let ran = getRandomArbitrary(percentFromCenter, 100);
+  if (ran < getRandomArbitrary(50, 85)) {
+    dwemi.direction = dwemi.direction * -1;
+  }
+}
 
 function getWanderDestination() {
-	return Math.floor(dwemi.direction * getRandomArbitrary(50, 200) + dwemi.dx);
+  pickDirection();
+	return Math.floor(dwemi.direction * getRandomArbitrary(80, 180) + dwemi.dx);
 }
 
 function getRandomArbitrary(min, max) {
