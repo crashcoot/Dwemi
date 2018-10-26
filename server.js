@@ -93,14 +93,18 @@ io.on("connection", socket => {
 });
 
 const canvas = {width: 1200, height: 600}
+const middle = canvas.width/2;
+
 var dwemi = {dw: 150, dh: 272, dx: 500, dy: 320};
-dwemi.state = "wander";
 dwemi.direction = 1
 dwemi.destination = getWanderDestination();
 dwemi.speed = 10; //Higher the slower
 dwemi.pause = false;
 dwemi.pauseLength;
 dwemi.pauseStart;
+
+dwemi.hunger = 50;
+dwemi.joy = 50;
 
 let time = new Date().getTime();
 let timedif = 0
@@ -116,7 +120,7 @@ function dwemiUpdate(sockets) {
   if (!dwemi.pause) {
     dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
       //All cases where dwemi needs to stop and move the other direction
-      if (dwemi.dx <= 0 || dwemi.dx >= canvas.width-160) {
+      if (dwemi.dx <= 0 || dwemi.dx >= canvas.width-180) {
         destinationReached()
       }
       if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || (dwemi.direction == -1 && dwemi.dx < dwemi.destination) || (dwemi.dx > canvas.width*2 || dwemi.dx < -200)) {
@@ -130,7 +134,7 @@ function dwemiUpdate(sockets) {
 }
 
 function dwemiDataEmit(sockets) {
-  let dwemiData = {x: dwemi.dx, y: dwemi.dy}
+  let dwemiData = {x: dwemi.dx, y: dwemi.dy, hunger: dwemi.hunger, joy: dwemi.joy}
   dwemiData = JSON.stringify(dwemiData)
   for (id in sockets) {
     sockets[id].emit("dwemiData", dwemiData)
@@ -145,7 +149,6 @@ function checkPause() {
 
 //What to do when Dwemi has reached his destination
 function destinationReached() {
-  dwemi.direction = dwemi.direction*-1;
   dwemi.destination = getWanderDestination();
   dwemi.pause = true;
   dwemi.pauseStart = new Date().getTime();
@@ -161,16 +164,24 @@ console.log("To Test:")
 console.log("Open several browsers at: http://localhost:8080/dwemi.html")
 
 function pickDirection() {
-  let percentFromCenter = Math.floor(Math.abs(canvas.width/2 - dwemi.dx)/(canvas.width/2)*100);
-  let ran = getRandomArbitrary(percentFromCenter, 100);
-  if (ran < getRandomArbitrary(50, 85)) {
+  let percentFromCenter = Math.floor(Math.abs(middle - dwemi.dx)/(middle)*100);
+  let ran1 = getRandomArbitrary(percentFromCenter, 100);
+  let ran2 = getRandomArbitrary(75, 85)
+  //console.log("ran1: "+ ran1)
+  //console.log("ran2: " + ran2)
+  if (ran1 > ran2 && !checkMovingToMiddle()) {
     dwemi.direction = dwemi.direction * -1;
+    //console.log("switch")
   }
 }
 
 function getWanderDestination() {
   pickDirection();
 	return Math.floor(dwemi.direction * getRandomArbitrary(80, 180) + dwemi.dx);
+}
+
+function checkMovingToMiddle() {
+  return ((dwemi.dx <= middle && dwemi.direction ==1) || dwemi.dx > middle && dwemi.direction == -1)
 }
 
 function getRandomArbitrary(min, max) {
