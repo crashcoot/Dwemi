@@ -116,7 +116,7 @@ function dwemiUpdate(sockets) {
   if (!dwemi.pause) {
     dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
       //All cases where dwemi needs to stop and move the other direction
-      if (dwemi.dx <= 0 || dwemi.dx >= canvas.width) {
+      if (dwemi.dx <= 0 || dwemi.dx >= canvas.width-160) {
         destinationReached()
       }
       if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || (dwemi.direction == -1 && dwemi.dx < dwemi.destination) || (dwemi.dx > canvas.width*2 || dwemi.dx < -200)) {
