@@ -1,7 +1,7 @@
 
 
 var newimg = new Image(100,181);
-var dwemi = {img: newimg, dw: 150, dh: 272, dx: 500, dy: 320};
+var dwemi = {img: newimg, dw: 150, dh: 272, dx: 500, dy: 800};
 dwemi.img.src = "images/pet.jpg"
 dwemi.img.alt = "My pet";
 
@@ -36,6 +36,7 @@ function drawCanvas() {
   context.fillRect(0, 0, canvas.width, canvas.height); //erase canvas
 
   context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+  console.log(dwemi.dx)
 }
 
 function loop(timestamp) {

@@ -116,7 +116,10 @@ function dwemiUpdate(sockets) {
   if (!dwemi.pause) {
     dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
       //All cases where dwemi needs to stop and move the other direction
-      if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || dwemi.dx > canvas.width - 150 || (dwemi.direction == -1 && dwemi.dx < dwemi.destination) || dwemi.dx < 0 || (dwemi.dx > canvas.width*2 || dwemi.dx < -200)) {
+      if (dwemi.dx <= 0 || dwemi.dx >= canvas.width) {
+        destinationReached()
+      }
+      if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || (dwemi.direction == -1 && dwemi.dx < dwemi.destination) || (dwemi.dx > canvas.width*2 || dwemi.dx < -200)) {
         destinationReached()
       }
   } else {
