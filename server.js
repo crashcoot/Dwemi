@@ -5,7 +5,7 @@ const io = require('socket.io')(app) //wrap server app in socket io capability
 const fs = require("fs") //need to read static files
 const url = require("url") //to parse url strings
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 8080
 app.listen(PORT) //start server listening on PORT
 
 function handler(request, response) {
@@ -155,7 +155,7 @@ function destinationReached() {
 
 console.log("Server Running at PORT: 3000  CNTL-C to quit")
 console.log("To Test:")
-console.log("Open several browsers at: http://localhost:3000/dwemi.html")
+console.log("Open several browsers at: http://localhost:8080/dwemi.html")
 
 function pickDirection() {
   let percentFromCenter = Math.floor(Math.abs(canvas.width/2 - dwemi.dx)/(canvas.width/2)*100);
