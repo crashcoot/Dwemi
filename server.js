@@ -2,7 +2,11 @@ var dwemi = {dw: 150, dh: 272, dx: 500, dy: 320};
 dwemi.state = "wander";
 dwemi.direction = 1
 dwemi.destination = getWanderDestination();
-dwemi.speed = 1; //Higher the slower
+dwemi.speed = 10; //Higher the slower
+
+let time = new Date().getTime();
+let timedif = 0
+//console.log(time)
 
 const canvas = {width: 1200, height: 600}
 
@@ -100,8 +104,12 @@ function get_mime(filename) {
 }
 
 function dwemiUpdate(sockets) {
+  
+  timedif = new Date().getTime() - time;
+  time = new Date().getTime();
+  //console.log(timedif);
 
-  dwemi.dx += dwemi.speed * dwemi.direction;
+  dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
 
 	if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || dwemi.dx > canvas.width - 150) {
 		dwemi.direction = dwemi.direction*-1;
