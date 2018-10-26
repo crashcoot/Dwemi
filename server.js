@@ -1,24 +1,4 @@
-var dwemi = {dw: 150, dh: 272, dx: 500, dy: 320};
-dwemi.state = "wander";
-dwemi.direction = 1
-dwemi.destination = getWanderDestination();
-dwemi.speed = 10; //Higher the slower
 
-let time = new Date().getTime();
-let timedif = 0
-//console.log(time)
-
-const canvas = {width: 1200, height: 600}
-
-function getWanderDestination() {
-	return Math.floor(dwemi.direction * getRandomArbitrary(50, 200) + dwemi.dx);
-}
-
-function getRandomArbitrary(min, max) {
-	return Math.random() * (max - min) + min;
-}
-
-//Cntl+C to stop server
 
 const app = require('http').createServer(handler)
 const io = require('socket.io')(app) //wrap server app in socket io capability
@@ -70,12 +50,6 @@ function handler(request, response) {
   })
 }
 
-//server maintained location of moving box
-let movingBoxLocation = {
-  x: 100,
-  y: 100
-} //will be over-written by clients
-
 
 const ROOT_DIR = "html" //dir to serve static files from
 
@@ -103,40 +77,6 @@ function get_mime(filename) {
   return MIME_TYPES["txt"]
 }
 
-function dwemiUpdate(sockets) {
-  
-  timedif = new Date().getTime() - time;
-  time = new Date().getTime();
-  //console.log(timedif);
-
-  dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
-
-	if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || dwemi.dx > canvas.width - 150) {
-		dwemi.direction = dwemi.direction*-1;
-    dwemi.destination = getWanderDestination();
-	} else if ((dwemi.direction == -1 && dwemi.dx < dwemi.destination) || dwemi.dx < 0){
-		dwemi.direction = dwemi.direction*-1;
-		dwemi.destination = getWanderDestination();
-	}
-	
-	if (dwemi.dx > canvas.width*2 || dwemi.dx < -200) {
-		dwemi.dx = canvas.width/2
-		dwemi.direction = dwemi.direction*-1;
-		dwemi.destination = getWanderDestination();
-	}
-
-  dwemiDataEmit(sockets)
-
-}
-
-function dwemiDataEmit(sockets) {
-  let dwemiData = {x: dwemi.dx, y: dwemi.dy}
-  dwemiData = JSON.stringify(dwemiData)
-  for (id in sockets) {
-    sockets[id].emit("dwemiData", dwemiData)
-  }
-}
-
 var sockets = { };
 let interval;
 io.on("connection", socket => {
@@ -152,9 +92,76 @@ io.on("connection", socket => {
   });
 });
 
+var dwemi = {dw: 150, dh: 272, dx: 500, dy: 320};
+dwemi.state = "wander";
+dwemi.direction = 1
+dwemi.destination = getWanderDestination();
+dwemi.speed = 10; //Higher the slower
+dwemi.pause = false;
+dwemi.pauseLength;
+dwemi.pauseStart;
+
+let time = new Date().getTime();
+let timedif = 0
+//console.log(time)
+
+const canvas = {width: 1200, height: 600}
+
+function dwemiUpdate(sockets) {
+  
+  timedif = new Date().getTime() - time;
+  time = new Date().getTime();
+  //console.log(timedif);
+
+  if (!dwemi.pause) {
+    dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
+      //All cases where dwemi needs to stop and move the other direction
+      if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || dwemi.dx > canvas.width - 150 || (dwemi.direction == -1 && dwemi.dx < dwemi.destination) || dwemi.dx < 0 || (dwemi.dx > canvas.width*2 || dwemi.dx < -200)) {
+        destinationReached()
+      }
+  } else {
+    checkPause();
+  }
+  dwemiDataEmit(sockets)
+
+}
+
+function dwemiDataEmit(sockets) {
+  let dwemiData = {x: dwemi.dx, y: dwemi.dy}
+  dwemiData = JSON.stringify(dwemiData)
+  for (id in sockets) {
+    sockets[id].emit("dwemiData", dwemiData)
+  }
+}
+
+function checkPause() {
+  if (new Date().getTime() - dwemi.pauseStart > dwemi.pauseLength) {
+    dwemi.pause = false;
+  }
+}
+
+//What to do when Dwemi has reached his destination
+function destinationReached() {
+  dwemi.direction = dwemi.direction*-1;
+  dwemi.destination = getWanderDestination();
+  dwemi.pause = true;
+  dwemi.pauseStart = new Date().getTime();
+  dwemi.pauseLength = getRandomArbitrary(500, 1500);
+}
+
+
 
 
 
 console.log("Server Running at PORT: 3000  CNTL-C to quit")
 console.log("To Test:")
 console.log("Open several browsers at: http://localhost:3000/dwemi.html")
+
+
+function getWanderDestination() {
+	return Math.floor(dwemi.direction * getRandomArbitrary(50, 200) + dwemi.dx);
+}
+
+function getRandomArbitrary(min, max) {
+	return Math.random() * (max - min) + min;
+}
