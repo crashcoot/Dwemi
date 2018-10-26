@@ -8,14 +8,6 @@ To run:
   
   
 TODO:
-    
-    -Hunger and Happiness levels:
-      
-      -Hunger/Happiness increase functions
-      
-      -Hunger/Happiness degrade over time
-      
-      -Doesn't move when Hunger empty
       
     -Change to Express
   
