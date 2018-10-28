@@ -1,23 +1,87 @@
+const oWidth = 1280;
+const oHeight = 800;
 
+var game = {
+  element: document.getElementById("gameContainer"),
+  width: oWidth,
+  height: oHeight
+},
 
-let newimg = new Image(100,181);
-var dwemi = {img: newimg, dw: 150, dh: 272, dx: 500, dy: 800};
-foodImage = new Image(72, 52)
-joyImage = new Image(72, 52)
-foodImage.src = "images/food.png"
-joyImage.src = "images/joy.png"
-dwemi.img.src = "images/pet.jpg"
+resizeGame = function() {
+  
+  // Get the dimensions of the viewport
+  var viewport = {
+    width: window.innerWidth,
+    height: window.innerHeight
+  };
+
+  // Determine game size
+  if (game.height / game.width > viewport.height / viewport.width) {
+    newGameHeight = viewport.height;
+    newGameWidth = newGameHeight * game.width / game.height;
+  } else {
+    newGameWidth = viewport.width;
+    newGameHeight = newGameWidth * game.height / game.width;
+  }
+
+  newGameX = (viewport.width - newGameWidth) / 2;
+  newGameY = (viewport.height - newGameHeight) / 2;
+  
+  // Center the game by setting the padding of the game
+  game.element.style.padding = newGameY + "px " + newGameX + "px";
+
+  // Resize game
+  game.width = newGameWidth;
+  game.height = newGameHeight;
+   
+};
+
+window.addEventListener("resize", resizeGame);
+resizeGame();
+
+var dwemi = {
+  img: new Image(100,181),
+  dw: 100,
+  scaleWidth: 100/oWidth,
+  dh: 181,
+  scaleHeight: 181/oHeight,
+  dx: 500,
+  dy: 800
+};
+dwemi.img.src = "images/pet.png"
 dwemi.img.alt = "My pet";
+foodImage = new Image(83, 78)
+foodImage.src = "images/food.png"
+foodIcon = {
+  img: foodImage,
+  scaleX: 20/oWidth,
+  scaleY: 20/oHeight,
+  scaleWidth: 83/oWidth,
+  scaleHeight: 78/oHeight
+}
+joyImage = new Image(83, 78)
+joyImage.src = "images/joy.png"
+joyIcon = {
+  img: joyImage,
+  scaleX: 20/oWidth,
+  scaleY: 90/oHeight,
+  scaleWidth: 83/oWidth,
+  scaleHeight: 78/oHeight
+}
+
+
 
 let hungerBar = {
-  x: 0,
-  y: 0,
+  scaleX: 111/oWidth,
+  scaleY: 33/oHeight,
+  scaleHeight: 51/oHeight,
   filled: 0
 }
 
 let joyBar = {
-  x: 0,
-  y: 0,
+  scaleX: 111/oWidth,
+  scaleY: 103/oHeight,
+  scaleHeight: 51/oHeight,
   filled: 0
 }
 
@@ -40,8 +104,8 @@ socket.on("dwemiData", function(data) {
   //console.log("data: " + data)
   //console.log("typeof: " + typeof data)
   let dwemiData = JSON.parse(data)
-  dwemi.dx = dwemiData.x
-  dwemi.dy = dwemiData.y
+  dwemi.dx = dwemiData.x*game.width
+  dwemi.dy = dwemiData.y*game.height
   hungerBar.filled = dwemiData.hunger;
   joyBar.filled = dwemiData.joy;
 })
@@ -49,17 +113,18 @@ socket.on("dwemiData", function(data) {
 
 function drawCanvas() {
   const context = canvas.getContext("2d");
+  context.canvas.width = game.width;
+  context.canvas.height = game.height;
   context.fillStyle = "white";
   context.fillRect(0, 0, canvas.width, canvas.height); //erase canvas
 
-  context.drawImage(foodImage, 20, 20)
+  context.drawImage(foodIcon.img, foodIcon.scaleX*game.width, foodIcon.scaleY*game.height, foodIcon.scaleWidth*game.width, foodIcon.scaleHeight*game.height)
   context.fillStyle = "orange";
-  context.fillRect(90, 25, hungerBar.filled, 30)
-  context.drawImage(joyImage, 20, 70)
+  context.fillRect(hungerBar.scaleX*game.width, hungerBar.scaleY*game.height, hungerBar.filled/oWidth*game.width, hungerBar.scaleHeight*game.height)
+  context.drawImage(joyIcon.img, joyIcon.scaleX*game.width, joyIcon.scaleY*game.height, joyIcon.scaleWidth*game.width, joyIcon.scaleHeight*game.height)
   context.fillStyle = "green";
-  context.fillRect(90, 80, joyBar.filled, 30)
-  context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-  console.log(dwemi.dx)
+  context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
+  context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.scaleWidth*game.width*1.5, dwemi.scaleHeight*game.height*1.5);
 }
 
 function loop(timestamp) {
@@ -78,7 +143,6 @@ function feedButton() {
 function joyButton() {
   socket.emit('joy');
 }
-
 
 $(document).ready(function() {
   drawCanvas()

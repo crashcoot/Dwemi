@@ -86,18 +86,18 @@ io.on("connection", socket => {
   }
   sockets[socket.id] = socket;
   interval = setInterval(() => dwemiUpdate(sockets), 10);
-  socket.on('feed', () => {upJoy()});
-  socket.on('joy', () => {upFood()});
+  socket.on('feed', () => {upFood()});
+  socket.on('joy', () => {upJoy()});
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     delete sockets[socket.id];
   });
 });
 
-const canvas = {width: 1200, height: 600}
+const canvas = {width: 1280, height: 800}
 const middle = canvas.width/2;
 
-var dwemi = {dw: 150, dh: 272, dx: 500, dy: 320};
+var dwemi = {dw: 100, dh: 181, dx: 500, dy: 528};
 dwemi.direction = 1
 dwemi.destination = getWanderDestination();
 dwemi.speed = 10; //Higher the slower
@@ -105,8 +105,8 @@ dwemi.pause = false;
 dwemi.pauseLength;
 dwemi.pauseStart;
 
-dwemi.hunger = 1000;
-dwemi.joy = 1000;
+dwemi.hunger = 500;
+dwemi.joy = 500;
 
 let time = new Date().getTime();
 let timedif = 0
@@ -121,7 +121,7 @@ function dwemiUpdate(sockets) {
 
   updateHunger(timedif)
   updateJoy(timedif);
-  if (dwemi.hunger > 1 || dwemi.joy > 1) {
+  if (dwemi.hunger > 1 && dwemi.joy > 1) {
     if (!dwemi.pause) {
       dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
         //All cases where dwemi needs to stop and move the other direction
@@ -141,7 +141,7 @@ function dwemiUpdate(sockets) {
 }
 
 function dwemiDataEmit(sockets) {
-  let dwemiData = {x: dwemi.dx, y: dwemi.dy, hunger: dwemi.hunger, joy: dwemi.joy}
+  let dwemiData = {x: dwemi.dx/canvas.width, y: dwemi.dy/canvas.height, hunger: dwemi.hunger, joy: dwemi.joy}
   dwemiData = JSON.stringify(dwemiData)
   for (id in sockets) {
     sockets[id].emit("dwemiData", dwemiData)
@@ -164,7 +164,7 @@ function destinationReached() {
 
 function updateHunger(dif) {
   if (dwemi.hunger >= 1) {
-    dwemi.hunger -= (dif/100);
+    dwemi.hunger -= (dif/1000);
   }
   if (dwemi.hunger < 1) {
     dwemi.hunger == 0;
@@ -174,7 +174,7 @@ function updateHunger(dif) {
 
 function updateJoy(dif) {
   if (dwemi.joy >= 1) {
-    dwemi.joy -= (dif/100);
+    dwemi.joy -= (dif/1000);
   }
   if (dwemi.joy < 1) {
     dwemi.joy == 0;
@@ -182,18 +182,18 @@ function updateJoy(dif) {
 }
 
 function upFood() {
-  if (dwemi.hunger+10 >= 1000) {
+  if (dwemi.hunger+100 >= 1000) {
     dwemi.hunger = 1000;
   } else if (dwemi.hunger < 1000) {
-    dwemi.hunger += 10;
+    dwemi.hunger += 100;
   }
 }
 
 function upJoy() {
-  if (dwemi.joy+10 >= 1000) {
+  if (dwemi.joy+100 >= 1000) {
     dwemi.joy = 1000;
   } else if (dwemi.joy < 1000) {
-    dwemi.joy += 10;
+    dwemi.joy += 100;
   }
 }
 
