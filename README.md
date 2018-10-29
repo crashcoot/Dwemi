@@ -9,13 +9,11 @@ To run:
   
 TODO:
       
-    -Change to Express
+    -
   
   
   
   Long term Goals:
-    
-    -Have Dwemi be sustained on data being fed, with some data being preferred (ex: different pixel colours in images fed)
     
     -Dwemi able to search web for data to eat
     
