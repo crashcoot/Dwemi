@@ -28,6 +28,7 @@ io.on("connection", socket => {
   interval = setInterval(() => dwemiUpdate(sockets), 10);
   socket.on('feed', (data) => {upFood(data)});
   socket.on('joy', () => {upJoy()});
+  socket.on("moveHere", (data) => {moveHere(data)})
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     delete sockets[socket.id];
@@ -40,6 +41,7 @@ const middle = canvas.width/2;
 var dwemi = {dw: 100, dh: 181, dx: 500, dy: 528};
 dwemi.direction = 1
 dwemi.destination = getWanderDestination();
+dwemi.defaultSpeed = 10;
 dwemi.speed = 10; //Higher the slower
 dwemi.pause = false;
 dwemi.pauseLength;
@@ -102,6 +104,7 @@ function checkPause() {
 
 //What to do when Dwemi has reached his destination
 function destinationReached() {
+  dwemi.speed = dwemi.defaultSpeed;
   dwemi.destination = getWanderDestination();
   dwemi.pause = true;
   dwemi.pauseStart = new Date().getTime();
@@ -148,6 +151,19 @@ function upJoy() {
   }
 }
 
+function moveHere(data) {
+  dwemi.pause = false;
+  dwemi.speed = 3;
+  target = JSON.parse(data);
+  console.log("Move here:  " + target);
+  if (dwemi.dx > target) {
+    dwemi.direction = -1;
+  } else {
+    target -= 150;
+    dwemi.direction = 1;
+  }
+  dwemi.destination = target;
+}
 
 
 

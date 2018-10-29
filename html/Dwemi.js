@@ -55,7 +55,6 @@ var dwemi = {
   dy: oHeight + 200
 };
 dwemi.img.src = "images/pet.png"
-console.log(dwemi.img);
 dwemi.img.alt = "My pet";
 foodImage = new Image(83, 78)
 foodImage.src = "images/food.png"
@@ -111,6 +110,7 @@ function update(progress) {
 let socket = io('http://' + window.document.location.host)
 //let socket = io('http://localhost:3000')
 
+let deltaX, deltaY //location where mouse is pressed
 let canvas = document.getElementById("canvas1") //our drawing canvas
 
 socket.on("dwemiData", function(data) {
@@ -127,7 +127,6 @@ socket.on("dwemiData", function(data) {
 
 
 function drawCanvas() {
-  console.log(dwemi.dx);
   const context = canvas.getContext("2d");
   context.canvas.width = game.width;
   context.canvas.height = game.height - 30;
@@ -199,6 +198,11 @@ function handleMouseDown(e){
 	
 	if (mouseOnDwemi(canvasX, canvasY)) { 
     joyButton();
+  } else {
+    let target = (canvasX/game.width) * oWidth;
+    console.log(target);
+    let targetData = JSON.stringify(target);
+    socket.emit("moveHere", targetData);
   }
 	
 	$("#canvas1").mousemove(handleMouseMove);
@@ -215,8 +219,8 @@ function handleMouseDown(e){
 	drawCanvas();
   }
   
-  function handleMouseMove() {
-
+  function handleMouseMove(e) {
+    
   }
 
   function handleMouseUp() {
