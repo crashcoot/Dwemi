@@ -1,0 +1,27 @@
+{
+  "name": "dwemi",
+  "version": "1.0.0",
+  "description": "Virtual Pet",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.16.4",
+    "js-base64": "^2.4.9",
+    "mongodb": "^3.1.8",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crashcoot/Dwemi.git"
+  },
+  "author": "Derek Burney",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crashcoot/Dwemi/issues"
+  },
+  "homepage": "https://github.com/crashcoot/Dwemi#readme"
+}
