@@ -164,7 +164,7 @@ function drawCanvas() {
   context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
   context.fillStyle = "black";
   context.font = hungerBar.textScaleFont*game.height + "px Arial";
-  context.fillText(Math.floor(hungerBar.filled/100) + "KB" , hungerBar.textScaleX*game.width, hungerBar.textScaleY*game.height);
+  context.fillText(Math.floor(hungerBar.filled/1000) + "KB" , hungerBar.textScaleX*game.width, hungerBar.textScaleY*game.height);
   context.fillText(Math.floor(joyBar.filled/10) , joyBar.textScaleX*game.width, joyBar.textScaleY*game.height);
   for (let i = 0; i < indicatorArray.length; i++) {
     console.log(indicatorArray[i].x)
