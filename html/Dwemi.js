@@ -111,8 +111,10 @@ socket.on("dwemiData", function(data) {
   //console.log("data: " + data)
   //console.log("typeof: " + typeof data)
   let dwemiData = JSON.parse(data)
-  dwemi.dx = dwemiData.x*game.width
-  dwemi.dy = dwemiData.y*game.height
+  dwemi.dx = dwemiData.x*game.width;
+  dwemi.dy = dwemiData.y*game.height -30;
+  dwemi.dw = dwemi.scaleWidth*game.width*1.5;
+  dwemi.dh = dwemi.scaleHeight*game.height*1.5;
   hungerBar.filled = dwemiData.hunger;
   joyBar.filled = dwemiData.joy;
 })
@@ -131,7 +133,7 @@ function drawCanvas() {
   context.drawImage(joyIcon.img, joyIcon.scaleX*game.width, joyIcon.scaleY*game.height, joyIcon.scaleWidth*game.width, joyIcon.scaleHeight*game.height)
   context.fillStyle = "green";
   context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
-  context.drawImage(dwemi.img, dwemi.dx, dwemi.dy - 30, dwemi.scaleWidth*game.width*1.5, dwemi.scaleHeight*game.height*1.5);
+  context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
 }
 
 function loop(timestamp) {
@@ -170,6 +172,46 @@ function toDataURL(src, callback, outputFormat) {
   }
 }
 
+function mouseOnDwemi(canvasX, canvasY) {
+  return ((canvasX > dwemi.dx && canvasX < (dwemi.dx + dwemi.dw)) && (canvasY > dwemi.dy && canvasY < (dwemi.dy + dwemi.dh)))
+}
+
+function handleMouseDown(e){
+	
+	//get mouse location relative to canvas top left
+	var rect = canvas.getBoundingClientRect();
+    //var canvasX = e.clientX - rect.left;
+    //var canvasY = e.clientY - rect.top;
+    var canvasX = e.pageX - rect.left; //use jQuery event object pageX and pageY
+    var canvasY = e.pageY - rect.top;
+	console.log("mouse down:" + canvasX + ", " + canvasY);
+	
+	if (mouseOnDwemi(canvasX, canvasY)) { 
+    joyButton();
+  }
+	
+	$("#canvas1").mousemove(handleMouseMove);
+	$("#canvas1").mouseup(handleMouseUp);
+	   
+	
+
+    // Stop propagation of the event and stop any default 
+    //  browser action
+
+    e.stopPropagation();
+    e.preventDefault();
+	
+	drawCanvas();
+  }
+  
+  function handleMouseMove() {
+
+  }
+
+  function handleMouseUp() {
+
+  }
+
 $(document).ready(function() {
   drawCanvas()
 
@@ -185,7 +227,7 @@ $(document).ready(function() {
     )
   });
 
-  $("#canvas1").mousedown(joyButton)
+  document.getElementById("canvas1").addEventListener("mousedown", handleMouseDown);
 })
 
 })();
