@@ -52,7 +52,7 @@ var dwemi = {
   dh: 181,
   scaleHeight: 181/oHeight,
   dx: 500,
-  dy: oHeight + 200
+  dy: 9000
 };
 dwemi.img.src = "images/pet.png"
 dwemi.img.alt = "My pet";
@@ -97,11 +97,22 @@ let joyBar = {
   textScaleFont: 30/oHeight
 }
 
+let indicatorArray = []
+function cleanIndicatorArray() {
+  let time = new Date().getTime();
+  for (var i = 0; i < indicatorArray.length; i++) {
+    if (indicatorArray[i].endTime < time) {
+      indicatorArray.splice(i, 1);
+    }
+  }
+}
+
 var lastRender = 0
 window.requestAnimationFrame(loop)
 
 function update(progress) {
-	// Update the state of the world for the elapsed time since last render
+  // Update the state of the world for the elapsed time since last render
+  cleanIndicatorArray();
 	drawCanvas();
 }
 
@@ -125,6 +136,17 @@ socket.on("dwemiData", function(data) {
   joyBar.filled = dwemiData.joy;
 })
 
+socket.on("flash", function(data) {
+  let target = JSON.parse(data)
+  let indicator = {
+    x: target.x/oWidth *game.width,
+    y: target.y/oHeight * game.height,
+    endTime: new Date().getTime() + 200,
+  }
+  console.log(indicator.x)
+  indicatorArray.push(indicator);
+})
+
 
 function drawCanvas() {
   const context = canvas.getContext("2d");
@@ -144,6 +166,14 @@ function drawCanvas() {
   context.font = hungerBar.textScaleFont*game.height + "px Arial";
   context.fillText(Math.floor(hungerBar.filled/100) + "KB" , hungerBar.textScaleX*game.width, hungerBar.textScaleY*game.height);
   context.fillText(Math.floor(joyBar.filled/10) , joyBar.textScaleX*game.width, joyBar.textScaleY*game.height);
+  for (let i = 0; i < indicatorArray.length; i++) {
+    console.log(indicatorArray[i].x)
+    context.fillStyle = "red";
+    context.beginPath();
+    context.arc(indicatorArray[i].x, indicatorArray[i].y, 10/oWidth*game.width, 0, Math.PI*2, true); 
+    context.closePath();
+    context.fill();
+  }
 }
 
 function loop(timestamp) {
@@ -199,8 +229,11 @@ function handleMouseDown(e){
 	if (mouseOnDwemi(canvasX, canvasY)) { 
     joyButton();
   } else {
-    let target = (canvasX/game.width) * oWidth;
-    console.log(target);
+    let target = {
+      x: (canvasX/game.width) * oWidth,
+      y: (canvasY/game.height) * oHeight
+    }
+    console.log(target.x);
     let targetData = JSON.stringify(target);
     socket.emit("moveHere", targetData);
   }

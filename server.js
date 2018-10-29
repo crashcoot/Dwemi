@@ -154,15 +154,19 @@ function upJoy() {
 function moveHere(data) {
   dwemi.pause = false;
   dwemi.speed = 3;
+  for (id in sockets) {
+    sockets[id].emit("flash", data)
+  }
   target = JSON.parse(data);
-  console.log("Move here:  " + target);
-  if (dwemi.dx > target) {
+  console.log("Move here:  " + target.x);
+  if (dwemi.dx > target.x) {
     dwemi.direction = -1;
   } else {
-    target -= 150;
+    target.x -= 150;
     dwemi.direction = 1;
   }
-  dwemi.destination = target;
+  dwemi.destination = target.x;
+
 }
 
 
