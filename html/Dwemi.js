@@ -80,16 +80,22 @@ joyIcon = {
 
 let hungerBar = {
   scaleX: 111/oWidth,
-  scaleY: 33/oHeight,
+  scaleY: 29/oHeight,
   scaleHeight: 51/oHeight,
-  filled: 0
+  filled: 0,
+  textScaleX: (111 + 5)/oWidth,
+  textScaleY: (29 + 36)/oHeight,
+  textScaleFont: 30/oHeight
 }
 
 let joyBar = {
   scaleX: 111/oWidth,
-  scaleY: 103/oHeight,
+  scaleY: 104/oHeight,
   scaleHeight: 51/oHeight,
-  filled: 0
+  filled: 0,
+  textScaleX: (111 + 5)/oWidth,
+  textScaleY: (104 + 36)/oHeight,
+  textScaleFont: 30/oHeight
 }
 
 var lastRender = 0
@@ -121,6 +127,7 @@ socket.on("dwemiData", function(data) {
 
 
 function drawCanvas() {
+  console.log(dwemi.dx);
   const context = canvas.getContext("2d");
   context.canvas.width = game.width;
   context.canvas.height = game.height - 30;
@@ -129,11 +136,15 @@ function drawCanvas() {
 
   context.drawImage(foodIcon.img, foodIcon.scaleX*game.width, foodIcon.scaleY*game.height, foodIcon.scaleWidth*game.width, foodIcon.scaleHeight*game.height)
   context.fillStyle = "orange";
-  context.fillRect(hungerBar.scaleX*game.width, hungerBar.scaleY*game.height, hungerBar.filled/oWidth*game.width, hungerBar.scaleHeight*game.height)
+  context.fillRect(hungerBar.scaleX*game.width, hungerBar.scaleY*game.height, (hungerBar.filled/100000)*1000/oWidth*game.width, hungerBar.scaleHeight*game.height)
   context.drawImage(joyIcon.img, joyIcon.scaleX*game.width, joyIcon.scaleY*game.height, joyIcon.scaleWidth*game.width, joyIcon.scaleHeight*game.height)
   context.fillStyle = "green";
   context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
   context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+  context.fillStyle = "black";
+  context.font = hungerBar.textScaleFont*game.height + "px Arial";
+  context.fillText(Math.floor(hungerBar.filled/100) + "KB" , hungerBar.textScaleX*game.width, hungerBar.textScaleY*game.height);
+  context.fillText(Math.floor(joyBar.filled/10) , joyBar.textScaleX*game.width, joyBar.textScaleY*game.height);
 }
 
 function loop(timestamp) {

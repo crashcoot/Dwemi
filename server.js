@@ -44,8 +44,10 @@ dwemi.speed = 10; //Higher the slower
 dwemi.pause = false;
 dwemi.pauseLength;
 dwemi.pauseStart;
+dwemi.stomach = "";
+dwemi.waste = "";
 
-dwemi.hunger = 500;
+dwemi.hunger = dwemi.stomach.length/8;
 dwemi.joy = 500;
 
 let time = new Date().getTime();
@@ -63,14 +65,18 @@ function dwemiUpdate(sockets) {
   updateJoy(timedif);
   if (dwemi.hunger > 1 && dwemi.joy > 1) {
     if (!dwemi.pause) {
-      dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
         //All cases where dwemi needs to stop and move the other direction
-        if (dwemi.dx <= 0 || dwemi.dx >= canvas.width-180) {
+        if (dwemi.dx <= 5 || dwemi.dx >= canvas.width-150) {
           destinationReached()
         }
-        if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || (dwemi.direction == -1 && dwemi.dx < dwemi.destination) || (dwemi.dx > canvas.width*2 || dwemi.dx < -200)) {
+        if (dwemi.dx < -100 || dwemi.dx > canvas.width + 100) {
+          dwemi.dx = 500;
+          destinationReached();
+        }
+        if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || (dwemi.direction == -1 && dwemi.dx < dwemi.destination)) {
           destinationReached()
         }
+        dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
     } else {
       checkPause();
     }
@@ -81,7 +87,7 @@ function dwemiUpdate(sockets) {
 }
 
 function dwemiDataEmit(sockets) {
-  let dwemiData = {x: dwemi.dx/canvas.width, y: dwemi.dy/canvas.height, hunger: dwemi.hunger, joy: dwemi.joy}
+  let dwemiData = {x: dwemi.dx/canvas.width, y: dwemi.dy/canvas.height, hunger: dwemi.stomach.length/8, joy: dwemi.joy}
   dwemiData = JSON.stringify(dwemiData)
   for (id in sockets) {
     sockets[id].emit("dwemiData", dwemiData)
@@ -102,14 +108,17 @@ function destinationReached() {
   dwemi.pauseLength = getRandomArbitrary(200, 1500);
 }
 
+function hitBorder() {
+  if (!checkMovingToMiddle) {
+    dwemi.direction = dwemi.direction * -1;
+  }
+  dwemi.destination = dwemi.dx + (dwemi.direction * 100);
+}
+
 function updateHunger(dif) {
-  if (dwemi.hunger >= 1) {
-    dwemi.hunger -= (dif/1000);
-  }
-  if (dwemi.hunger < 1) {
-    dwemi.hunger == 0;
-  }
-  //console.log(dwemi.hunger);
+  dwemi.stomach = dwemi.stomach.substring(0, dwemi.stomach.length-dif);
+  dwemi.waste = dwemi.waste += dwemi.stomach.slice(-dif);
+  dwemi.hunger = dwemi.stomach.length;
 }
 
 function updateJoy(dif) {
@@ -123,12 +132,11 @@ function updateJoy(dif) {
 
 function upFood(data) {
   food = JSON.parse(data);
-  hungerValue = food.length/800
-  console.log("Fed:" + hungerValue);
-  if (dwemi.hunger+hungerValue >= 1000) {
-    dwemi.hunger = 1000;
-  } else if (dwemi.hunger < 1000) {
-    dwemi.hunger += hungerValue;
+  if ((dwemi.stomach.length + food.length) < 800000) {
+    dwemi.stomach += food;
+  } else {
+    let trim = (dwemi.stomach.length + food.length) - 800000
+    dwemi.stomach += food.substring(0, food.length - trim);
   }
 }
 
