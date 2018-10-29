@@ -26,7 +26,7 @@ io.on("connection", socket => {
   }
   sockets[socket.id] = socket;
   interval = setInterval(() => dwemiUpdate(sockets), 10);
-  socket.on('feed', () => {upFood()});
+  socket.on('feed', (data) => {upFood(data)});
   socket.on('joy', () => {upJoy()});
   socket.on("disconnect", () => {
     console.log("Client disconnected");
@@ -121,11 +121,14 @@ function updateJoy(dif) {
   }
 }
 
-function upFood() {
-  if (dwemi.hunger+100 >= 1000) {
+function upFood(data) {
+  food = JSON.parse(data);
+  hungerValue = food.length/800
+  console.log("Fed:" + hungerValue);
+  if (dwemi.hunger+hungerValue >= 1000) {
     dwemi.hunger = 1000;
   } else if (dwemi.hunger < 1000) {
-    dwemi.hunger += 100;
+    dwemi.hunger += hungerValue;
   }
 }
 

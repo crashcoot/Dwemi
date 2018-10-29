@@ -1,3 +1,9 @@
+
+
+(() => {
+
+
+
 const oWidth = 1280;
 const oHeight = 800;
 
@@ -21,7 +27,7 @@ resizeGame = function() {
     newGameWidth = newGameHeight * game.width / game.height;
   } else {
     newGameWidth = viewport.width;
-    newGameHeight = newGameWidth * game.height / game.width;
+    newGameHeight = (newGameWidth * game.height / game.width);
   }
 
   newGameX = (viewport.width - newGameWidth) / 2;
@@ -46,9 +52,10 @@ var dwemi = {
   dh: 181,
   scaleHeight: 181/oHeight,
   dx: 500,
-  dy: 800
+  dy: oHeight + 200
 };
 dwemi.img.src = "images/pet.png"
+console.log(dwemi.img);
 dwemi.img.alt = "My pet";
 foodImage = new Image(83, 78)
 foodImage.src = "images/food.png"
@@ -114,7 +121,7 @@ socket.on("dwemiData", function(data) {
 function drawCanvas() {
   const context = canvas.getContext("2d");
   context.canvas.width = game.width;
-  context.canvas.height = game.height;
+  context.canvas.height = game.height - 30;
   context.fillStyle = "white";
   context.fillRect(0, 0, canvas.width, canvas.height); //erase canvas
 
@@ -124,7 +131,7 @@ function drawCanvas() {
   context.drawImage(joyIcon.img, joyIcon.scaleX*game.width, joyIcon.scaleY*game.height, joyIcon.scaleWidth*game.width, joyIcon.scaleHeight*game.height)
   context.fillStyle = "green";
   context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
-  context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.scaleWidth*game.width*1.5, dwemi.scaleHeight*game.height*1.5);
+  context.drawImage(dwemi.img, dwemi.dx, dwemi.dy - 30, dwemi.scaleWidth*game.width*1.5, dwemi.scaleHeight*game.height*1.5);
 }
 
 function loop(timestamp) {
@@ -136,14 +143,49 @@ function loop(timestamp) {
 	window.requestAnimationFrame(loop)
 }
 
-function feedButton() {
-  socket.emit('feed');
-}
 
 function joyButton() {
   socket.emit('joy');
 }
 
+
+
+function toDataURL(src, callback, outputFormat) {
+  var img = new Image();
+  img.crossOrigin = 'Anonymous';
+  img.onload = function() {
+    var canvas2 = document.createElement('CANVAS');
+    var ctx = canvas2.getContext('2d');
+    var dataURL;
+    canvas2.height = this.naturalHeight;
+    canvas2.width = this.naturalWidth;
+    ctx.drawImage(this, 0, 0);
+    dataURL = canvas2.toDataURL(outputFormat);
+    callback(dataURL);
+  };
+  img.src = src;
+  if (img.complete || img.complete === undefined) {
+    img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+    img.src = src;
+  }
+}
+
 $(document).ready(function() {
   drawCanvas()
+
+  document.getElementById("submitButton").addEventListener("click", function(){
+    var text = document.getElementById("textBox").value;
+    document.getElementById("textBox").value = "";
+    toDataURL(
+      text,
+      function(dataUrl) {
+        let food = JSON.stringify(dataUrl)
+        socket.emit("feed", food);
+      }
+    )
+  });
+
+  $("#canvas1").mousedown(joyButton)
 })
+
+})();
