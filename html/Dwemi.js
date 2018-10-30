@@ -47,10 +47,10 @@ resizeGame();
 
 var dwemi = {
   img: new Image(100,181),
-  dw: 150,
-  scaleWidth: 150/oWidth,
-  dh: 324,
-  scaleHeight: 324/oHeight,
+  dw: 100,
+  scaleWidth: 100/oWidth,
+  dh: 181,
+  scaleHeight: 181/oHeight,
   dx: 500,
   dy: 9000
 };
@@ -131,9 +131,9 @@ socket.on("dwemiData", function(data) {
   //console.log("typeof: " + typeof data)
   let dwemiData = JSON.parse(data)
   dwemi.dx = dwemiData.x*game.width;
-  dwemi.dy = dwemiData.y*game.height ;
-  dwemi.dw = dwemi.scaleWidth*game.width;
-  dwemi.dh = dwemi.scaleHeight*game.height;
+  dwemi.dy = dwemiData.y*game.height -30;
+  dwemi.dw = dwemi.scaleWidth*game.width*1.5;
+  dwemi.dh = dwemi.scaleHeight*game.height*1.5;
   hungerBar.filled = dwemiData.hunger;
   joyBar.filled = dwemiData.joy;
 })
@@ -163,9 +163,9 @@ function drawCanvas() {
   context.drawImage(joyIcon.img, joyIcon.scaleX*game.width, joyIcon.scaleY*game.height, joyIcon.scaleWidth*game.width, joyIcon.scaleHeight*game.height)
   context.fillStyle = "green";
   context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
-  dwemi.background.src = new Image(100, 180);
+  dwemi.background.src = new Image(100, 180)
   dwemi.background.src = "images/stomachimages/background.jpg"
-  context.drawImage(dwemi.background, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+  context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
   context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
   context.fillStyle = "black";
   context.font = hungerBar.textScaleFont*game.height + "px Arial";
@@ -222,8 +222,7 @@ function mouseOnDwemi(canvasX, canvasY) {
 }
 
 function handleMouseDown(e){
-  dwemi.background.src = "images/stomachimages/background.jpg#" + new Date().getTime();
-	
+	document.getElementById('background').src = 'images/stomachimages/background.jpg?' + (new Date()).getTime();
 	//get mouse location relative to canvas top left
 	var rect = canvas.getBoundingClientRect();
     //var canvasX = e.clientX - rect.left;
@@ -271,6 +270,9 @@ $(document).ready(function() {
 
   document.getElementById("submitButton").addEventListener("click", function(){
     var text = document.getElementById("textBox").value;
+    setInterval(function(){ 
+      document.getElementById('background').src = 'images/stomachimages/background.jpg?' + (new Date()).getTime();
+     }, 5000);
     socket.emit("photo", JSON.stringify(text))
     document.getElementById("textBox").value = "";
     toDataURL(

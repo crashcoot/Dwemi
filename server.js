@@ -48,7 +48,7 @@ MongoClient.connect(url, function(err, db) {
   const canvas = {width: 1280, height: 800}
   const middle = canvas.width/2;
 
-  var dwemi = {dw: 150, dh: 324, dx: 500, dy: 450};
+  var dwemi = {dw: 100, dh: 180, dx: 500, dy: 528};
   dwemi.name = "dwemi";
   dwemi.direction = 1;
   dwemi.destination = getWanderDestination();
@@ -98,7 +98,7 @@ MongoClient.connect(url, function(err, db) {
   }
 
   function dwemiDataEmit(sockets) {
-    let dwemiData = {x: dwemi.dx/canvas.width, y: (dwemi.dy)/canvas.height, hunger: dwemi.stomach.length/8, joy: dwemi.joy}
+    let dwemiData = {x: dwemi.dx/canvas.width, y: dwemi.dy/canvas.height, hunger: dwemi.stomach.length/8, joy: dwemi.joy}
     dwemiData = JSON.stringify(dwemiData)
     for (id in sockets) {
       sockets[id].emit("dwemiData", dwemiData)
