@@ -1,10 +1,9 @@
 
 var mongo = require('mongodb');
-
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/dwemidb";
 
-MongoClient.connect(url, function(err, db) {
+MongoClient.connect(url, function(err, db) { //Not currently using this but will later
   if (err) throw err;
   var dbo = db.db("dwemidb");
 
@@ -12,25 +11,22 @@ MongoClient.connect(url, function(err, db) {
   var app = express();
   var http = require('http').Server(app);
   var io = require('socket.io')(http);
+  var fs = require('fs');
   const download = require('image-downloader')
 
-  const PORT = process.env.PORT || 8081
+  const PORT = process.env.PORT || 8080
 
   app.use(express.static('html'))
-
   app.get('/', function(req, res){
     res.sendFile(__dirname + '/');
   });
-
-  http.listen(8081, function(){
-    
-  });
+  http.listen(8080, function(){});
 
   var sockets = { };
-  let interval;
+  let interval; //To be used for looping through the sockets
   io.on("connection", socket => {
     console.log("New client connected");
-    if (interval) {
+    if (interval) { //If someone connects, restart the interval
       clearInterval(interval);
     }
     sockets[socket.id] = socket;
@@ -48,6 +44,7 @@ MongoClient.connect(url, function(err, db) {
   const canvas = {width: 1280, height: 800}
   const middle = canvas.width/2;
 
+  //Creates Dwemi
   var dwemi = {dw: 100, dh: 180, dx: 500, dy: 528};
   dwemi.name = "dwemi";
   dwemi.direction = 1;
@@ -64,18 +61,15 @@ MongoClient.connect(url, function(err, db) {
 
   let time = new Date().getTime();
   let timedif = 0
-  //console.log(time)
 
   function dwemiUpdate(sockets) {
     
     timedif = new Date().getTime() - time;
     time = new Date().getTime();
-    //console.log(timedif);
-
     updateHunger(timedif)
     updateJoy(timedif);
-    if (dwemi.hunger > 1 && dwemi.joy > 1) {
-      if (!dwemi.pause) {
+    if (dwemi.hunger > 1 && dwemi.joy > 1) { //Don't move if he's not out of food or joy
+      if (!dwemi.pause) { //Don't move if pause is true
           //All cases where dwemi needs to stop and move the other direction
           if (dwemi.dx <= 5 || dwemi.dx >= canvas.width-190) {
             destinationReached()
@@ -89,7 +83,7 @@ MongoClient.connect(url, function(err, db) {
           }
           dwemi.dx += Math.floor(timedif/dwemi.speed) * dwemi.direction;
       } else {
-        checkPause();
+        checkPause(); //Check if it's time to unpause
       }
     }
     
@@ -97,8 +91,9 @@ MongoClient.connect(url, function(err, db) {
 
   }
 
+  //Sends the info about dwemi the clients need to know
   function dwemiDataEmit(sockets) {
-    let dwemiData = {x: dwemi.dx/canvas.width, y: dwemi.dy/canvas.height, hunger: dwemi.stomach.length/8, joy: dwemi.joy,}
+    let dwemiData = {x: dwemi.dx/canvas.width, y: dwemi.dy/canvas.height, hunger: dwemi.stomach.length, joy: dwemi.joy,}
     dwemiData.direction = dwemi.direction
     //console.log(dwemiData.direction)
     dwemiData = JSON.stringify(dwemiData)
@@ -122,6 +117,7 @@ MongoClient.connect(url, function(err, db) {
     dwemi.pauseLength = getRandomArbitrary(200, 1500);
   }
 
+  //If dwemi's x means he hit a border, turn him around
   function hitBorder() {
     if (!checkMovingToMiddle) {
       dwemi.direction = dwemi.direction * -1;
@@ -137,7 +133,7 @@ MongoClient.connect(url, function(err, db) {
 
   function updateJoy(dif) {
     if (dwemi.joy >= 1) {
-      dwemi.joy -= (dif/1000);
+      dwemi.joy -= (dif/3000);
     }
     if (dwemi.joy < 1) {
       dwemi.joy == 0;
@@ -146,11 +142,14 @@ MongoClient.connect(url, function(err, db) {
 
   function upFood(data) {
     food = JSON.parse(data);
-    if ((dwemi.stomach.length + food.length) < 800000) {
+    console.log("Food: " + food.length)
+    if ((dwemi.stomach.length + food.length) < 1600000) {
+      console.log("fed: " + food.length)
       dwemi.stomach += food;
     } else {
-      let trim = (dwemi.stomach.length + food.length) - 800000
+      let trim = (dwemi.stomach.length + food.length) - 1600000
       dwemi.stomach += food.substring(0, food.length - trim);
+      console.log("fed: " + food.length - trim)
     }
   }
 

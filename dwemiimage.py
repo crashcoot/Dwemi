@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pylab as plt
 from PIL import Image
 import time
+import scipy.misc
 
 while True:
     # gets image1
@@ -28,12 +29,6 @@ while True:
     # new image make from im1 and im2 spliced by masking condition
     newim = np.where(mask, im1, im2)
     
-    plt.imshow(newim, interpolation='nearest')
-    plt.axis("off")
-    plt.xticks([])
-    plt.yticks([])
-    plt.tight_layout()
-    import scipy.misc
     scipy.misc.imsave('html/images/stomachImages/background.jpg', newim)
     print("Done")
     time.sleep(5)

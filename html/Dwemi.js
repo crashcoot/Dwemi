@@ -2,11 +2,11 @@
 
 (() => {
 
-
-
-const oWidth = 1280;
+//Everything on the server is done thinking the canvas is 1280x800, so just keeping track of that here to be used in scaling
+const oWidth = 1280; 
 const oHeight = 800;
 
+//The canvas is in an article with ID "gamecontainer"
 var game = {
   element: document.getElementById("gameContainer"),
   width: oWidth,
@@ -14,13 +14,11 @@ var game = {
 },
 
 resizeGame = function() {
-  
   // Get the dimensions of the viewport
   var viewport = {
     width: window.innerWidth,
     height: window.innerHeight
   };
-
   // Determine game size
   if (game.height / game.width > viewport.height / viewport.width) {
     newGameHeight = viewport.height;
@@ -29,24 +27,22 @@ resizeGame = function() {
     newGameWidth = viewport.width;
     newGameHeight = (newGameWidth * game.height / game.width);
   }
-
   newGameX = (viewport.width - newGameWidth) / 2;
   newGameY = (viewport.height - newGameHeight) / 2;
-  
   // Center the game by setting the padding of the game
   game.element.style.padding = newGameY + "px " + newGameX + "px";
-
   // Resize game
   game.width = newGameWidth;
   game.height = newGameHeight;
-   
 };
 
 window.addEventListener("resize", resizeGame);
 resizeGame();
 
+//Object creation
 var dwemi = {
-  img: new Image(200,200),
+  left: new Image(200,200),
+  right: new Image(200,200),
   dw: 200,
   scaleWidth: 200/oWidth,
   dh: 200,
@@ -54,10 +50,10 @@ var dwemi = {
   dx: 500,
   dy: 9000
 };
-dwemi.img.src = "images/dwemi.png"
+dwemi.left.src = "images/dwemiLeft.png"
+dwemi.right.src = "images/dwemiRight.png"
 dwemi.background = new Image(200, 200)
 dwemi.background.src = "images/stomachimages/background.jpg"
-dwemi.img.alt = "My pet";
 foodImage = new Image(83, 78)
 foodImage.src = "images/food.png"
 foodIcon = {
@@ -76,9 +72,6 @@ joyIcon = {
   scaleWidth: 83/oWidth,
   scaleHeight: 78/oHeight
 }
-
-
-
 let hungerBar = {
   scaleX: 111/oWidth,
   scaleY: 29/oHeight,
@@ -88,7 +81,6 @@ let hungerBar = {
   textScaleY: (29 + 36)/oHeight,
   textScaleFont: 30/oHeight
 }
-
 let joyBar = {
   scaleX: 111/oWidth,
   scaleY: 104/oHeight,
@@ -99,12 +91,12 @@ let joyBar = {
   textScaleFont: 30/oHeight
 }
 
-let indicatorArray = []
+let indicatorArray = [] //When the mouse is clicked on the canvas, an indicator is created with a lifespan of 200ms and placed here
 function cleanIndicatorArray() {
-  let time = new Date().getTime();
+  let time = new Date().getTime(); //current time
   for (var i = 0; i < indicatorArray.length; i++) {
-    if (indicatorArray[i].endTime < time) {
-      indicatorArray.splice(i, 1);
+    if (indicatorArray[i].endTime < time) { //if the endtime is in the past
+      indicatorArray.splice(i, 1); //remove the indicator from the array
     }
   }
 }
@@ -114,34 +106,28 @@ window.requestAnimationFrame(loop)
 
 function update(progress) {
   // Update the state of the world for the elapsed time since last render
-  cleanIndicatorArray();
+  cleanIndicatorArray(); //Check if any indicators need to be removed
 	drawCanvas();
 }
 
 
 //connect to server and retain the socket
 let socket = io('http://' + window.document.location.host)
-//let socket = io('http://localhost:3000')
 
-let deltaX, deltaY //location where mouse is pressed
 let canvas = document.getElementById("canvas1") //our drawing canvas
 
-socket.on("dwemiData", function(data) {
-  //console.log("data: " + data)
-  //console.log("typeof: " + typeof data)
+socket.on("dwemiData", function(data) { //The server spams the client with info about dwemi
   let dwemiData = JSON.parse(data)
-  dwemi.dx = dwemiData.x*game.width;
-  dwemi.dy = dwemiData.y*game.height -30;
+  dwemi.dx = dwemiData.x*game.width; //The x value is sent as a value/1280 to be scaled
+  dwemi.dy = dwemiData.y*game.height -30; //The y value is sent as a value/800 to be scaled
   dwemi.dw = dwemi.scaleWidth*game.width;
   dwemi.dh = dwemi.scaleHeight*game.height;
-  dwemi.direction = dwemiData.direction;
+  dwemi.direction = dwemiData.direction; //1 for right and -1 for left
   hungerBar.filled = dwemiData.hunger;
   joyBar.filled = dwemiData.joy;
 })
 
-dwemi.right = new Image(200, 200)
-dwemi.right.src = "images/dwemiRight.png"
-
+//An indicator is sent
 socket.on("flash", function(data) {
   let target = JSON.parse(data)
   let indicator = {
@@ -157,21 +143,25 @@ socket.on("flash", function(data) {
 function drawCanvas() {
   const context = canvas.getContext("2d");
   context.canvas.width = game.width;
-  context.canvas.height = game.height - 30;
+  context.canvas.height = game.height - 30; //-30 to make room for the textbox
   context.fillStyle = "white";
   context.fillRect(0, 0, canvas.width, canvas.height); //erase canvas
-
+  //Food
   context.drawImage(foodIcon.img, foodIcon.scaleX*game.width, foodIcon.scaleY*game.height, foodIcon.scaleWidth*game.width, foodIcon.scaleHeight*game.height)
   context.fillStyle = "orange";
-  context.fillRect(hungerBar.scaleX*game.width, hungerBar.scaleY*game.height, (hungerBar.filled/100000)*1000/oWidth*game.width, hungerBar.scaleHeight*game.height)
+  context.fillRect(hungerBar.scaleX*game.width, hungerBar.scaleY*game.height, (hungerBar.filled/1600000)*1000/oWidth*game.width, hungerBar.scaleHeight*game.height)
+  //Joy
   context.drawImage(joyIcon.img, joyIcon.scaleX*game.width, joyIcon.scaleY*game.height, joyIcon.scaleWidth*game.width, joyIcon.scaleHeight*game.height)
   context.fillStyle = "green";
   context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
+  //Dwemi
   drawDwemi(context);
+  //Text
   context.fillStyle = "black";
   context.font = hungerBar.textScaleFont*game.height + "px Arial";
-  context.fillText(Math.floor(hungerBar.filled/1000) + "KB" , hungerBar.textScaleX*game.width, hungerBar.textScaleY*game.height);
+  context.fillText(Math.floor(hungerBar.filled/125) + "KB" , hungerBar.textScaleX*game.width, hungerBar.textScaleY*game.height);
   context.fillText(Math.floor(joyBar.filled/10) , joyBar.textScaleX*game.width, joyBar.textScaleY*game.height);
+  //Indicators
   for (let i = 0; i < indicatorArray.length; i++) {
     console.log(indicatorArray[i].x)
     context.fillStyle = "red";
@@ -179,6 +169,17 @@ function drawCanvas() {
     context.arc(indicatorArray[i].x, indicatorArray[i].y, 10/oWidth*game.width, 0, Math.PI*2, true); 
     context.closePath();
     context.fill();
+  }
+}
+
+function drawDwemi(context) {
+  if (dwemi.direction == 1) { //Facing right
+    context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+    context.drawImage(dwemi.right, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+  } else { //facing left
+    dwemi.background.src = "images/stomachimages/background.jpg"
+    context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+    context.drawImage(dwemi.left, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
   }
 }
 
@@ -191,24 +192,13 @@ function loop(timestamp) {
 	window.requestAnimationFrame(loop)
 }
 
-
+//Tells the server to make him happy
 function joyButton() {
   socket.emit('joy');
 }
 
-function drawDwemi(context) {
-  console.log(dwemi.direction)
-  if (dwemi.direction == 1) {
-    context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-    context.drawImage(dwemi.right, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
-  } else {
-    dwemi.background.src = "images/stomachimages/background.jpg"
-    context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-    context.drawImage(dwemi.img, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
-  }
-}
 
-
+//Makes a canvas, slaps an image on it, then encodes the canvas
 function toDataURL(src, callback, outputFormat) {
   var img = new Image();
   img.crossOrigin = 'Anonymous';
@@ -229,20 +219,21 @@ function toDataURL(src, callback, outputFormat) {
   }
 }
 
+//Checks if the coordinates are on Dwemi
 function mouseOnDwemi(canvasX, canvasY) {
   return ((canvasX > dwemi.dx && canvasX < (dwemi.dx + dwemi.dw)) && (canvasY > dwemi.dy && canvasY < (dwemi.dy + dwemi.dh)))
 }
 
+
 function handleMouseDown(e){
-	//document.getElementById('background').src = 'images/stomachimages/background.jpg?' + (new Date()).getTime();
 	//get mouse location relative to canvas top left
 	var rect = canvas.getBoundingClientRect();
     //var canvasX = e.clientX - rect.left;
     //var canvasY = e.clientY - rect.top;
     var canvasX = e.pageX - rect.left; //use jQuery event object pageX and pageY
     var canvasY = e.pageY - rect.top;
-	console.log("mouse down:" + canvasX + ", " + canvasY);
-	
+  console.log("mouse down:" + canvasX + ", " + canvasY);
+  //If it's on dwemi, make him happy. If not, make an indicator and get dwemi to move to the x of the mouse event
 	if (mouseOnDwemi(canvasX, canvasY)) { 
     joyButton();
   } else {
@@ -254,27 +245,13 @@ function handleMouseDown(e){
     let targetData = JSON.stringify(target);
     socket.emit("moveHere", targetData);
   }
-	
-	$("#canvas1").mousemove(handleMouseMove);
-	$("#canvas1").mouseup(handleMouseUp);
-	   
-	
-
-    // Stop propagation of the event and stop any default 
-    //  browser action
+  
+  //To be used later
+	//$("#canvas1").mousemove(handleMouseMove);
+	//$("#canvas1").mouseup(handleMouseUp);
 
     e.stopPropagation();
     e.preventDefault();
-	
-	drawCanvas();
-  }
-  
-  function handleMouseMove(e) {
-    
-  }
-
-  function handleMouseUp() {
-
   }
 
 $(document).ready(function() {
@@ -294,7 +271,11 @@ $(document).ready(function() {
         socket.emit("feed", food);
       }
     )
+    testimg = new Image(0,0)
+    testimg.src = text
   });
+
+  
 
   document.getElementById("canvas1").addEventListener("mousedown", handleMouseDown);
 })
