@@ -46,16 +46,16 @@ window.addEventListener("resize", resizeGame);
 resizeGame();
 
 var dwemi = {
-  img: new Image(100,181),
-  dw: 100,
-  scaleWidth: 100/oWidth,
-  dh: 181,
-  scaleHeight: 181/oHeight,
+  img: new Image(200,200),
+  dw: 200,
+  scaleWidth: 200/oWidth,
+  dh: 200,
+  scaleHeight: 200/oHeight,
   dx: 500,
   dy: 9000
 };
-dwemi.img.src = "images/transparentPet.png"
-dwemi.background = new Image(100, 180)
+dwemi.img.src = "images/dwemi.png"
+dwemi.background = new Image(200, 200)
 dwemi.background.src = "images/stomachimages/background.jpg"
 dwemi.img.alt = "My pet";
 foodImage = new Image(83, 78)
@@ -132,11 +132,15 @@ socket.on("dwemiData", function(data) {
   let dwemiData = JSON.parse(data)
   dwemi.dx = dwemiData.x*game.width;
   dwemi.dy = dwemiData.y*game.height -30;
-  dwemi.dw = dwemi.scaleWidth*game.width*1.5;
-  dwemi.dh = dwemi.scaleHeight*game.height*1.5;
+  dwemi.dw = dwemi.scaleWidth*game.width;
+  dwemi.dh = dwemi.scaleHeight*game.height;
+  dwemi.direction = dwemiData.direction;
   hungerBar.filled = dwemiData.hunger;
   joyBar.filled = dwemiData.joy;
 })
+
+dwemi.right = new Image(200, 200)
+dwemi.right.src = "images/dwemiRight.png"
 
 socket.on("flash", function(data) {
   let target = JSON.parse(data)
@@ -163,10 +167,7 @@ function drawCanvas() {
   context.drawImage(joyIcon.img, joyIcon.scaleX*game.width, joyIcon.scaleY*game.height, joyIcon.scaleWidth*game.width, joyIcon.scaleHeight*game.height)
   context.fillStyle = "green";
   context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
-  dwemi.background.src = new Image(100, 180)
-  dwemi.background.src = "images/stomachimages/background.jpg"
-  context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-  context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+  drawDwemi(context);
   context.fillStyle = "black";
   context.font = hungerBar.textScaleFont*game.height + "px Arial";
   context.fillText(Math.floor(hungerBar.filled/1000) + "KB" , hungerBar.textScaleX*game.width, hungerBar.textScaleY*game.height);
@@ -195,6 +196,17 @@ function joyButton() {
   socket.emit('joy');
 }
 
+function drawDwemi(context) {
+  console.log(dwemi.direction)
+  if (dwemi.direction == 1) {
+    context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+    context.drawImage(dwemi.right, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+  } else {
+    dwemi.background.src = "images/stomachimages/background.jpg"
+    context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+    context.drawImage(dwemi.img, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+  }
+}
 
 
 function toDataURL(src, callback, outputFormat) {
@@ -222,7 +234,7 @@ function mouseOnDwemi(canvasX, canvasY) {
 }
 
 function handleMouseDown(e){
-	document.getElementById('background').src = 'images/stomachimages/background.jpg?' + (new Date()).getTime();
+	//document.getElementById('background').src = 'images/stomachimages/background.jpg?' + (new Date()).getTime();
 	//get mouse location relative to canvas top left
 	var rect = canvas.getBoundingClientRect();
     //var canvasX = e.clientX - rect.left;

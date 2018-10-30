@@ -14,7 +14,7 @@ MongoClient.connect(url, function(err, db) {
   var io = require('socket.io')(http);
   const download = require('image-downloader')
 
-  const PORT = process.env.PORT || 8080
+  const PORT = process.env.PORT || 8081
 
   app.use(express.static('html'))
 
@@ -22,7 +22,7 @@ MongoClient.connect(url, function(err, db) {
     res.sendFile(__dirname + '/');
   });
 
-  http.listen(8080, function(){
+  http.listen(8081, function(){
     
   });
 
@@ -77,7 +77,7 @@ MongoClient.connect(url, function(err, db) {
     if (dwemi.hunger > 1 && dwemi.joy > 1) {
       if (!dwemi.pause) {
           //All cases where dwemi needs to stop and move the other direction
-          if (dwemi.dx <= 5 || dwemi.dx >= canvas.width-150) {
+          if (dwemi.dx <= 5 || dwemi.dx >= canvas.width-190) {
             destinationReached()
           }
           if (dwemi.dx < -100 || dwemi.dx > canvas.width + 100) {
@@ -98,7 +98,9 @@ MongoClient.connect(url, function(err, db) {
   }
 
   function dwemiDataEmit(sockets) {
-    let dwemiData = {x: dwemi.dx/canvas.width, y: dwemi.dy/canvas.height, hunger: dwemi.stomach.length/8, joy: dwemi.joy}
+    let dwemiData = {x: dwemi.dx/canvas.width, y: dwemi.dy/canvas.height, hunger: dwemi.stomach.length/8, joy: dwemi.joy,}
+    dwemiData.direction = dwemi.direction
+    //console.log(dwemiData.direction)
     dwemiData = JSON.stringify(dwemiData)
     for (id in sockets) {
       sockets[id].emit("dwemiData", dwemiData)
@@ -171,7 +173,7 @@ MongoClient.connect(url, function(err, db) {
     if (dwemi.dx > target.x) {
       dwemi.direction = -1;
     } else {
-      target.x -= 150;
+      target.x -= 190;
       dwemi.direction = 1;
     }
     dwemi.destination = target.x;
