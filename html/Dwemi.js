@@ -47,14 +47,16 @@ resizeGame();
 
 var dwemi = {
   img: new Image(100,181),
-  dw: 100,
-  scaleWidth: 100/oWidth,
-  dh: 181,
-  scaleHeight: 181/oHeight,
+  dw: 150,
+  scaleWidth: 150/oWidth,
+  dh: 324,
+  scaleHeight: 324/oHeight,
   dx: 500,
   dy: 9000
 };
-dwemi.img.src = "images/pet.png"
+dwemi.img.src = "images/transparentPet.png"
+dwemi.background = new Image(100, 180)
+dwemi.background.src = "images/stomachimages/background.jpg"
 dwemi.img.alt = "My pet";
 foodImage = new Image(83, 78)
 foodImage.src = "images/food.png"
@@ -82,7 +84,7 @@ let hungerBar = {
   scaleY: 29/oHeight,
   scaleHeight: 51/oHeight,
   filled: 0,
-  textScaleX: (111 + 5)/oWidth,
+  textScaleX: (111 + 7)/oWidth,
   textScaleY: (29 + 36)/oHeight,
   textScaleFont: 30/oHeight
 }
@@ -92,7 +94,7 @@ let joyBar = {
   scaleY: 104/oHeight,
   scaleHeight: 51/oHeight,
   filled: 0,
-  textScaleX: (111 + 5)/oWidth,
+  textScaleX: (111 + 9)/oWidth,
   textScaleY: (104 + 36)/oHeight,
   textScaleFont: 30/oHeight
 }
@@ -129,9 +131,9 @@ socket.on("dwemiData", function(data) {
   //console.log("typeof: " + typeof data)
   let dwemiData = JSON.parse(data)
   dwemi.dx = dwemiData.x*game.width;
-  dwemi.dy = dwemiData.y*game.height -30;
-  dwemi.dw = dwemi.scaleWidth*game.width*1.5;
-  dwemi.dh = dwemi.scaleHeight*game.height*1.5;
+  dwemi.dy = dwemiData.y*game.height ;
+  dwemi.dw = dwemi.scaleWidth*game.width;
+  dwemi.dh = dwemi.scaleHeight*game.height;
   hungerBar.filled = dwemiData.hunger;
   joyBar.filled = dwemiData.joy;
 })
@@ -161,6 +163,9 @@ function drawCanvas() {
   context.drawImage(joyIcon.img, joyIcon.scaleX*game.width, joyIcon.scaleY*game.height, joyIcon.scaleWidth*game.width, joyIcon.scaleHeight*game.height)
   context.fillStyle = "green";
   context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
+  dwemi.background.src = new Image(100, 180);
+  dwemi.background.src = "images/stomachimages/background.jpg"
+  context.drawImage(dwemi.background, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
   context.drawImage(dwemi.img, dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
   context.fillStyle = "black";
   context.font = hungerBar.textScaleFont*game.height + "px Arial";
@@ -217,6 +222,7 @@ function mouseOnDwemi(canvasX, canvasY) {
 }
 
 function handleMouseDown(e){
+  dwemi.background.src = "images/stomachimages/background.jpg#" + new Date().getTime();
 	
 	//get mouse location relative to canvas top left
 	var rect = canvas.getBoundingClientRect();
@@ -265,6 +271,7 @@ $(document).ready(function() {
 
   document.getElementById("submitButton").addEventListener("click", function(){
     var text = document.getElementById("textBox").value;
+    socket.emit("photo", JSON.stringify(text))
     document.getElementById("textBox").value = "";
     toDataURL(
       text,
