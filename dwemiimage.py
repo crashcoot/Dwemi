@@ -3,6 +3,7 @@ import matplotlib.pylab as plt
 from skimage import measure
 import random
 import time
+import scipy.misc
 
 while True:
 
@@ -48,12 +49,7 @@ while True:
         newim = np.concatenate((newim, yim), axis=1) #combine the new column with all the columns from before
 
 
-    plt.imshow(newim, interpolation='nearest')
-    plt.axis("off")
-    plt.xticks([])
-    plt.yticks([])
-    plt.tight_layout()
-    import scipy.misc
+
     scipy.misc.imsave('html/images/stomachImages/background.jpg', newim)
     print("Done")
     time.sleep(5)
