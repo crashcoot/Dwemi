@@ -9,7 +9,7 @@ while True:
     im1 = np.asarray(im1)
     im1 = im1[:, :, :3]
 
-    # gets image2 dimensions 
+    # gets image2 
     im2 = Image.open("html/images/stomachimages/test.jpg")
     im2 = np.asarray(im2)
     im2 = im2[:, :, :3]
@@ -17,6 +17,7 @@ while True:
     # image2 dimmensions
     im2Height, im2Width, _ = im2.shape
 
+    # crop image2
     im2 = im2[int(im2Height/2-100):int(im2Height/2+100), int(im2Width/2-100):int(im2Width/2+100), ]
 
     # mask for choosing chunks of each image
@@ -26,8 +27,7 @@ while True:
 
     # new image make from im1 and im2 spliced by masking condition
     newim = np.where(mask, im1, im2)
-
-
+    
     plt.imshow(newim, interpolation='nearest')
     plt.axis("off")
     plt.xticks([])
