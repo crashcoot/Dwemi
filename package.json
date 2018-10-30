@@ -1,10 +1,11 @@
 {
   "name": "dwemi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Virtual Pet",
   "main": "server.js",
   "dependencies": {
     "express": "^4.16.4",
+    "image-downloader": "^3.4.1",
     "js-base64": "^2.4.9",
     "mongodb": "^3.1.8",
     "socket.io": "^2.1.1"
