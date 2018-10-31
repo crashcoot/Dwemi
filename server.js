@@ -211,7 +211,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
 
 
   console.log("Server Running at PORT: " + PORT + "  CNTL-C to quit");
-  console.log("Open several browsers at: http://localhost:8080/dwemi.html")
+  console.log("Open several browsers at: http://localhost:8080")
 
 
 
