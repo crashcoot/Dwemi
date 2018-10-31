@@ -10,6 +10,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   var express = require('express');
   var app = express();
   var http = require('http').Server(app);
+  var uuid = require('uuid/v1');
   var io = require('socket.io')(http);
   var fs = require('fs');
   const download = require('image-downloader')
@@ -68,6 +69,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   dwemi.waste = "";
   dwemi.hunger = dwemi.stomach.length/8;
   dwemi.joy = 500;
+  dwemi.id = uuid();
 
   let time = new Date().getTime();
   let timedif = 0
