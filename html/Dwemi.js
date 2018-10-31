@@ -119,8 +119,14 @@ let socket = io('http://' + window.document.location.host)
 
 let canvas = document.getElementById("canvas1") //our drawing canvas
 
+let id = undefined;
 socket.on("dwemiData", function(data) { //The server spams the client with info about dwemi
-  let dwemiData = JSON.parse(data)
+  let dwemiData = JSON.parse(data);
+  if (!id) {
+    id = dwemiData.id;
+  } else {
+    if (id != dwemiData.id) window.location.reload(true);
+  }
   dwemi.dx = dwemiData.x*game.width; //The x value is sent as a value/1280 to be scaled
   dwemi.dw = dwemi.scaleWidth*game.width;
   dwemi.dh = dwemi.scaleHeight*game.height;
