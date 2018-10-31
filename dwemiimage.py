@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pylab as plt
-from PIL import Image
+from PIL import Image, ImageOps
 import time
 import scipy.misc
 
@@ -12,14 +12,12 @@ while True:
 
     # gets image2 
     im2 = Image.open("html/images/stomachimages/test.jpg")
+    im2 = ImageOps.fit(im2, (200,200)) # resizes and crops to 200X200
     im2 = np.asarray(im2)
     im2 = im2[:, :, :3]
     
     # image2 dimmensions
     im2Height, im2Width, _ = im2.shape
-
-    # crop image2
-    im2 = im2[int(im2Height/2-100):int(im2Height/2+100), int(im2Width/2-100):int(im2Width/2+100), ]
 
     # mask for choosing chunks of each image
     mask = np.random.binomial(1, 0.98, size=(40,40))    # creates 40x40 array of 1 or 0, 1 for im1 0 for im2
