@@ -41,22 +41,22 @@ resizeGame();
 
 //Object creation
 var dwemi = {
-  left: new Image(200,200),
-  right: new Image(200,200),
-  leftBlink: new Image(200,200),
-  rightBlink: new Image(200,200),
-  dw: 200,
-  scaleWidth: 200/oWidth,
-  dh: 200,
-  scaleHeight: 200/oHeight,
+  left: new Image(400,400),
+  right: new Image(400,400),
+  leftBlink: new Image(400,400),
+  rightBlink: new Image(400,400),
+  dw: 400,
+  scaleWidth: 400/oWidth,
+  dh: 400,
+  scaleHeight: 400/oHeight,
   dx: 500,
-  dy: 528/oHeight*game.height -30,
+  dy: 350/oHeight*game.height -30,
   blink: false
 };
-dwemi.left.src = "images/dwemiLeft.png"
-dwemi.right.src = "images/dwemiRight.png"
-dwemi.leftBlink.src = "images/dwemiLeftBlink.png";
-dwemi.rightBlink.src = "images/dwemiRightBlink.png"
+dwemi.left.src = "images/DwemiLeft.png"
+dwemi.right.src = "images/DwemiRight.png"
+dwemi.leftBlink.src = "images/DwemiLeftBlink.png";
+dwemi.rightBlink.src = "images/DwemiRightBlink.png"
 foodImage = new Image(83, 78)
 foodImage.src = "images/food.png"
 foodIcon = {
@@ -186,7 +186,7 @@ function drawCanvas(progress) {
 }
 
 function drawDwemi(context, progress) {
-  dwemi.dy = 528/oHeight*game.height -30;
+  dwemi.dy = 350/oHeight*game.height -30;
   dwemiBob(progress);
   if (dwemi.direction == 1) { //Facing right
     if (dwemi.blink) {

@@ -24,7 +24,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   });
   http.listen(8080, function(){});
 
-  setInterval(() => {let pyProg = spawn('python', ['dwemiimage.py']);}, 1000); //Runs the python script every 5 seconds
+  setInterval(() => {let pyProg = spawn('python', ['dwemiimage.py']);}, 5000); //Runs the python script every 5 seconds
 
   var sockets = { };
   let interval; //To be used for looping through the sockets
@@ -83,7 +83,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
     if (dwemi.hunger > 1 && dwemi.joy > 1) { //Don't move if he's not out of food or joy
       if (!dwemi.pause) { //Don't move if pause is true
           //All cases where dwemi needs to stop and move the other direction
-          if (dwemi.dx <= 5 || dwemi.dx >= canvas.width-190) {
+          if (dwemi.dx <= 5 || dwemi.dx >= canvas.width-380) {
             destinationReached()
           }
           if (dwemi.dx < -100 || dwemi.dx > canvas.width + 100) {
@@ -139,13 +139,13 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
 
   function updateHunger(dif) {
     dwemi.stomach = dwemi.stomach.substring(0, dwemi.stomach.length-dif);
-    dwemi.waste = dwemi.waste += dwemi.stomach.slice(-dif);
+    dwemi.waste = dwemi.waste += dwemi.stomach.slice(-Math.floor(dif/10));
     dwemi.hunger = dwemi.stomach.length;
   }
 
   function updateJoy(dif) {
     if (dwemi.joy >= 1) {
-      dwemi.joy -= (dif/3000);
+      dwemi.joy -= (dif/5000);
     }
     if (dwemi.joy < 1) {
       dwemi.joy == 0;
@@ -187,7 +187,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
     if (dwemi.dx > target.x) {
       dwemi.direction = -1;
     } else {
-      target.x -= 190;
+      target.x -= 380;
       dwemi.direction = 1;
     }
     dwemi.destination = target.x;
