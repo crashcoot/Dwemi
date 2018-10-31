@@ -201,14 +201,13 @@ function drawDwemi(context, progress) {
   }
   
 }
-rad = 0
-let radius =  5;
+let rad = 0
+let radius =  7;
 function dwemiBob(progress) { //for some reason adding/multiplying anything with progress crashes it
-  prog = parseFloat(progress/16.6);
-  console.log(typeof (rad + (1/48*Math.PI) + prog))
-  rad = rad + (1/48*Math.PI)
-  rad = rad%(2*Math.PI)
-  dwemi.dy += 7/oHeight*game.height * Math.cos(rad)
+  if (!progress) progress = 0;
+  rad = rad + (1/48*Math.PI) * + progress/16;
+  rad = rad%(2*Math.PI);
+  dwemi.dy += radius/oHeight*game.height * Math.cos(rad);
 }
 
 function loop(timestamp) {

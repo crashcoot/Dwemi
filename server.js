@@ -23,7 +23,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   });
   http.listen(8080, function(){});
 
-  setInterval(() => {let pyProg = spawn('python', ['dwemiimage.py']);}, 5000); //Runs the python script every 5 seconds
+  setInterval(() => {let pyProg = spawn('python', ['dwemiimage.py']);}, 1000); //Runs the python script every 5 seconds
 
   var sockets = { };
   let interval; //To be used for looping through the sockets
@@ -47,10 +47,12 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   const canvas = {width: 1280, height: 800}
   const middle = canvas.width/2;
   let stomach = "";
-  fs.readFile("digestion/stomach.txt", function(err, data) {
-    stomach = data;
-  });
-  console.log(stomach)
+  stomach = fs.readFileSync('C:/Dev/Dwemi/html/digestion/stomach.txt', 'utf8');;
+
+  setInterval(() => {
+    fs.writeFileSync('C:/Dev/Dwemi/html/digestion/stomach.txt', dwemi.stomach, 'utf8')
+    fs.writeFileSync('C:/Dev/Dwemi/html/digestion/waste.txt', dwemi.waste, 'utf8')
+  }, 10000);
 
   //Creates Dwemi
   var dwemi = {dw: 100, dh: 180, dx: 500, dy: 528};
