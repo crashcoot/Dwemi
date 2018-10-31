@@ -2,18 +2,18 @@
 var mongo = require('mongodb');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/dwemidb";
+var dbo = db.db("dwemidb");
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var fs = require('fs');
+var uuid = require('uuid/v1');
+const download = require('image-downloader')
+const { spawn } = require('child_process');
 
 MongoClient.connect(url, function(err, db) { //Not currently using this but will later
   if (err) throw err;
-  var dbo = db.db("dwemidb");
-
-  var express = require('express');
-  var app = express();
-  var http = require('http').Server(app);
-  var io = require('socket.io')(http);
-  var fs = require('fs');
-  const download = require('image-downloader')
-  const { spawn } = require('child_process');
 
   const PORT = process.env.PORT || 8080
 
@@ -66,6 +66,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   dwemi.waste = "";
   dwemi.hunger = dwemi.stomach.length/8;
   dwemi.joy = 500;
+  dwemi.id = uuid();
 
   let time = new Date().getTime();
   let timedif = 0
