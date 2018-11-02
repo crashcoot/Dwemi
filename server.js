@@ -6,6 +6,7 @@ var http = require('http').Server(app);
 var uuid = require('uuid/v1');
 var io = require('socket.io')(http);
 var fs = require('fs');
+var cacheControl = require("express-cache-controller")
 const download = require('image-downloader');
 const { spawn } = require('child_process');
 
@@ -17,12 +18,15 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   const PORT = process.env.PORT || 8080;
 
   app.use(express.static('html'));
+  app.use(cacheControl({
+    noCache: true
+  }));
   app.get('/', function(req, res){
     res.sendFile(__dirname + '/');
   });
   http.listen(8080, function(){});
 
-  setInterval(() => {let pyProg = spawn('python', ['dwemiimage.py']);}, 5000); //Runs the python script every 5 seconds
+  setInterval(() => {let pyProg = spawn('python', ['dwemiimage.py']);}, 2000); //Runs the python script every 5 seconds
 
   var sockets = { };
   let interval; //To be used for looping through the sockets
