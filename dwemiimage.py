@@ -4,14 +4,14 @@ from PIL import Image, ImageOps
 import time
 import scipy.misc
 
-IMAGE_SIZE = (200,200)
+IMAGE_SIZE = (400,400)
 BLOCK_SIZE = 5
 
 # dimension compatibility check
 if (IMAGE_SIZE[0]%BLOCK_SIZE != 0) or (IMAGE_SIZE[1]%BLOCK_SIZE != 0):
     raise ValueError(f"Image size setting {IMAGE_SIZE} not compatible with block size {BLOCK_SIZE}")
 
-BLOCK_MATRIX = (IMAGE_SIZE[0]/BLOCK_SIZE, IMAGE_SIZE[1]/BLOCK_SIZE)
+BLOCK_MATRIX = (int(IMAGE_SIZE[0]/BLOCK_SIZE), int(IMAGE_SIZE[1]/BLOCK_SIZE))
 
 def block_replace(im1, im2):
     """replaces im1 with im2 through block replacement
@@ -31,7 +31,7 @@ def avg_fade(im1, im2):
     returns new image
     """
     newim = np.round((im1*0.98 + im2 *0.02)/2)
-    newim = newim.astype(np.unint8)
+    newim = newim.astype(np.uint8)
     return newim
 
 # gets image1
