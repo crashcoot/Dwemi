@@ -41,19 +41,22 @@ resizeGame();
 
 //Object creation
 var dwemi = {
-  left: new Image(200,200),
-  right: new Image(200,200),
-  dw: 200,
-  scaleWidth: 200/oWidth,
-  dh: 200,
-  scaleHeight: 200/oHeight,
+  left: new Image(400,400),
+  right: new Image(400,400),
+  leftBlink: new Image(400,400),
+  rightBlink: new Image(400,400),
+  dw: 400,
+  scaleWidth: 400/oWidth,
+  dh: 400,
+  scaleHeight: 400/oHeight,
   dx: 500,
-  dy: 9000
+  dy: 350/oHeight*game.height -30,
+  blink: false
 };
-dwemi.left.src = "images/dwemiLeft.png"
-dwemi.right.src = "images/dwemiRight.png"
-dwemi.background = new Image(200, 200)
-dwemi.background.src = "images/stomachimages/background.jpg"
+dwemi.left.src = "images/DwemiLeft.png"
+dwemi.right.src = "images/DwemiRight.png"
+dwemi.leftBlink.src = "images/DwemiLeftBlink.png";
+dwemi.rightBlink.src = "images/DwemiRightBlink.png"
 foodImage = new Image(83, 78)
 foodImage.src = "images/food.png"
 foodIcon = {
@@ -107,7 +110,7 @@ window.requestAnimationFrame(loop)
 function update(progress) {
   // Update the state of the world for the elapsed time since last render
   cleanIndicatorArray(); //Check if any indicators need to be removed
-	drawCanvas();
+	drawCanvas(progress);
 }
 
 
@@ -116,10 +119,15 @@ let socket = io('http://' + window.document.location.host)
 
 let canvas = document.getElementById("canvas1") //our drawing canvas
 
+let id = undefined;
 socket.on("dwemiData", function(data) { //The server spams the client with info about dwemi
-  let dwemiData = JSON.parse(data)
+  let dwemiData = JSON.parse(data);
+  if (!id) {
+    id = dwemiData.id;
+  } else {
+    if (id != dwemiData.id) window.location.reload(true);
+  }
   dwemi.dx = dwemiData.x*game.width; //The x value is sent as a value/1280 to be scaled
-  dwemi.dy = dwemiData.y*game.height -30; //The y value is sent as a value/800 to be scaled
   dwemi.dw = dwemi.scaleWidth*game.width;
   dwemi.dh = dwemi.scaleHeight*game.height;
   dwemi.direction = dwemiData.direction; //1 for right and -1 for left
@@ -128,7 +136,7 @@ socket.on("dwemiData", function(data) { //The server spams the client with info 
 })
 
 //An indicator is sent
-socket.on("flash", function(data) {
+socket.on("flash", (data) => {
   let target = JSON.parse(data)
   let indicator = {
     x: target.x/oWidth *game.width,
@@ -139,8 +147,13 @@ socket.on("flash", function(data) {
   indicatorArray.push(indicator);
 })
 
+socket.on("blink", () => {
+  dwemi.blink = true;
+  setTimeout(() => {dwemi.blink = false}, 200)
+});
 
-function drawCanvas() {
+
+function drawCanvas(progress) {
   const context = canvas.getContext("2d");
   context.canvas.width = game.width;
   context.canvas.height = game.height - 30; //-30 to make room for the textbox
@@ -155,7 +168,7 @@ function drawCanvas() {
   context.fillStyle = "green";
   context.fillRect(joyBar.scaleX*game.width, joyBar.scaleY*game.height, joyBar.filled/oWidth*game.width, joyBar.scaleHeight*game.height)
   //Dwemi
-  drawDwemi(context);
+  drawDwemi(context, progress);
   //Text
   context.fillStyle = "black";
   context.font = hungerBar.textScaleFont*game.height + "px Arial";
@@ -172,15 +185,35 @@ function drawCanvas() {
   }
 }
 
-function drawDwemi(context) {
+function drawDwemi(context, progress) {
+  dwemi.dy = 350/oHeight*game.height -30;
+  dwemiBob(progress);
   if (dwemi.direction == 1) { //Facing right
-    context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-    context.drawImage(dwemi.right, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+    if (dwemi.blink) {
+      context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+      context.drawImage(dwemi.rightBlink, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+    } else {
+      context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+      context.drawImage(dwemi.right, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+    }
   } else { //facing left
-    dwemi.background.src = "images/stomachimages/background.jpg"
-    context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-    context.drawImage(dwemi.left, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+    if (dwemi.blink) {
+      context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+      context.drawImage(dwemi.leftBlink, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+    } else {
+      context.drawImage(document.getElementById('background'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+      context.drawImage(dwemi.left, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
+    }
   }
+  
+}
+let rad = 0
+let radius =  7;
+function dwemiBob(progress) { //for some reason adding/multiplying anything with progress crashes it
+  if (!progress) progress = 0;
+  rad = rad + (1/48*Math.PI) * + progress/16;
+  rad = rad%(2*Math.PI);
+  dwemi.dy += radius/oHeight*game.height * Math.cos(rad);
 }
 
 function loop(timestamp) {
@@ -210,6 +243,7 @@ function toDataURL(src, callback, outputFormat) {
     canvas2.width = this.naturalWidth;
     ctx.drawImage(this, 0, 0);
     dataURL = canvas2.toDataURL(outputFormat);
+    console.log(dataURL)
     callback(dataURL);
   };
   img.src = src;
@@ -271,8 +305,6 @@ $(document).ready(function() {
         socket.emit("feed", food);
       }
     )
-    testimg = new Image(0,0)
-    testimg.src = text
   });
 
   
