@@ -18,7 +18,7 @@ def block_replace(im1, im2):
     returns new image
     """
     # mask for choosing chunks of each image
-    mask = np.random.binomial(1, 0.98, size=BLOCK_MATRIX)    # creates 40x40 array of 1 or 0, 1 for im1 0 for im2
+    mask = np.random.binomial(1, 0.85, size=BLOCK_MATRIX)    # creates 40x40 array of 1 or 0, 1 for im1 0 for im2
     mask = mask.repeat(BLOCK_SIZE, axis=0).repeat(BLOCK_SIZE, axis=1)     # repeats the mask to be 200x200
     mask = np.expand_dims(mask, axis=-1)                # adds 3rd dimmension to be broadcastable with imgs
 
@@ -40,7 +40,7 @@ im1 = np.asarray(im1)
 im1 = im1[:, :, :3]
 
 # gets image2
-im2 = Image.open("html/images/stomachimages/test.jpg")
+im2 = Image.open("html/images/stomachimages/stomach.jpg")
 im2 = ImageOps.fit(im2, IMAGE_SIZE) # resizes and crops to 200X200
 im2 = np.asarray(im2)
 im2 = im2[:, :, :3]

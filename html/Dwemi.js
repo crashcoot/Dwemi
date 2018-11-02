@@ -287,20 +287,19 @@
   $(document).ready(function() {
     drawCanvas();
 
-    document.getElementById("submitButton").addEventListener("click", function(){
-      var text = document.getElementById("textBox").value;
-      setInterval(function(){
-        document.getElementById('background').src = 'images/stomachimages/background.jpg?' + (new Date()).getTime();
-      }, 5000);
+    setInterval(function(){
+      document.getElementById('background').src = 'images/stomachimages/background.jpg?' + (new Date()).getTime();
+    }, 5000);
+
+    document.getElementById("submitURLButton").addEventListener("click", function(){
+      var text = document.getElementById("urlBox").value;
       socket.emit("photo", JSON.stringify(text));
-      document.getElementById("textBox").value = "";
-      toDataURL(
-        text,
-        function(dataUrl) {
-          let food = JSON.stringify(dataUrl);
-          socket.emit("feed", food);
-        }
-      );
+    });
+
+    document.getElementById("submitSearchButton").addEventListener("click", function(){
+      var text = document.getElementById("searchBox").value;
+      socket.emit("search", JSON.stringify(text));
+      document.getElementById("searchBox").value = "";
     });
 
 

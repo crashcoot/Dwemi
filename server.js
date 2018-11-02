@@ -33,10 +33,10 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
     }
     sockets[socket.id] = socket;
     interval = setInterval(() => dwemiUpdate(sockets), 10);
-    socket.on('feed', (data) => upFood(data));
     socket.on("photo", (data) => savePicture(data));
     socket.on('joy', () => upJoy());
     socket.on("moveHere", (data) => moveHere(data));
+    socket.on("search", (data) => searchImage(data));
     socket.on("disconnect", () => {
       console.log("Client disconnected");
       delete sockets[socket.id];
@@ -44,17 +44,17 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   });
 
   const canvas = {width: 1280, height: 800};
-  const middle = canvas.width/2;
+  const middle = 480;
   let stomach = "";
   stomach = fs.readFileSync('C:/Dev/Dwemi/html/digestion/stomach.txt', 'utf8');;
 
   setInterval(() => {
     fs.writeFileSync('C:/Dev/Dwemi/html/digestion/stomach.txt', dwemi.stomach, 'utf8');
-    fs.writeFileSync('C:/Dev/Dwemi/html/digestion/waste.txt', dwemi.waste, 'utf8');
+    //fs.writeFileSync('C:/Dev/Dwemi/html/digestion/waste.txt', dwemi.waste, 'utf8');
   }, 10000);
 
   //Creates Dwemi
-  var dwemi = {dw: 100, dh: 180, dx: 500, dy: 528};
+  var dwemi = {dw: 100, dh: 180, dx: 300, dy: 528};
   dwemi.name = "dwemi";
   dwemi.direction = 1;
   dwemi.destination = getWanderDestination();
@@ -79,12 +79,8 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
     if (dwemi.hunger > 1 && dwemi.joy > 1) { //Don't move if he's not out of food or joy
       if (!dwemi.pause) { //Don't move if pause is true
           //All cases where dwemi needs to stop and move the other direction
-          if (dwemi.dx <= 5 || dwemi.dx >= canvas.width-380) {
-            destinationReached();
-          }
-          if (dwemi.dx < -100 || dwemi.dx > canvas.width + 100) {
-            dwemi.dx = 500;
-            destinationReached();
+          if (dwemi.dx <= 5 || dwemi.dx >= canvas.width-380 || dwemi.dx < -100 || (dwemi.dx + 380) > canvas.width + 100) {
+            hitBorder();
           }
           if ((dwemi.direction == 1 && dwemi.dx > dwemi.destination) || (dwemi.direction == -1 && dwemi.dx < dwemi.destination)) {
             destinationReached();
@@ -126,15 +122,13 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
 
   //If dwemi's x means he hit a border, turn him around
   function hitBorder() {
-    if (!checkMovingToMiddle) {
-      dwemi.direction = dwemi.direction * -1;
-    }
+    faceMiddle();
     dwemi.destination = dwemi.dx + (dwemi.direction * 100);
   }
 
   function updateHunger(dif) {
-    dwemi.stomach = dwemi.stomach.substring(0, dwemi.stomach.length-dif);
-    dwemi.waste = dwemi.waste += dwemi.stomach.slice(-Math.floor(dif/10));
+    dwemi.stomach = dwemi.stomach.substring(0, dwemi.stomach.length-1);
+    //dwemi.waste = dwemi.waste += dwemi.stomach.slice(-Math.floor(dif/10));
     dwemi.hunger = dwemi.stomach.length;
   }
 
@@ -147,8 +141,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
     }
   }
 
-  function upFood(data) {
-    food = JSON.parse(data);
+  function upFood(food) {
     console.log("Food: " + food.length);
     if ((dwemi.stomach.length + food.length) < 1600000) {
       console.log("fed: " + food.length);
@@ -188,15 +181,27 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
     dwemi.destination = target.x;
   }
 
+  function searchImage(foodData) {
+    query = JSON.parse(foodData);
+    console.log(query)
+    let pyProg = spawn('python', ['dwemicrawler.py', query]);
+    setTimeout(function(){
+      let imageData = fs.readFileSync("../dwemi/html/images/stomachImages/stomach.jpg", { encoding: 'base64' })
+      upFood(imageData);
+    }, 5000);
+  }
+
   function savePicture(data) {
     let imgurl = JSON.parse(data);
     options = {
       url: imgurl,
-      dest: 'html/images/stomachImages/test.jpg'
+      dest: 'html/images/stomachImages/stomach.jpg'
     };
     download.image(options)
     .then(({ filename, image }) => {
       console.log('File saved to', filename);
+      let imageData = fs.readFileSync("../dwemi/html/images/stomachImages/stomach.jpg", { encoding: 'base64' })
+      upFood(imageData);
     })
     .catch((err) => {
       console.error(err);
@@ -226,7 +231,16 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
     return ((dwemi.dx <= middle && dwemi.direction ==1) || dwemi.dx > middle && dwemi.direction == -1);
   }
 
+  function faceMiddle() {
+    if (dwemi.dx > 640) {
+      dwemi.direction = -1;
+    } else {
+      dwemi.direction = 1;
+    }
+  }
+
   function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
   }
 });
+
