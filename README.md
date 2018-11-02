@@ -9,13 +9,11 @@ To run:
   
 TODO:
       
-    -Comment (lol)
+    
   
   
   
   Long term Goals:
-    
-    -Dwemi able to search web for data to eat
     
     -Chat
     
