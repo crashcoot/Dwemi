@@ -4,7 +4,7 @@ from PIL import Image, ImageOps
 import time
 import scipy.misc
 
-IMAGE_SIZE = (200,200)
+IMAGE_SIZE = (400,400)
 BLOCK_SIZE = 5
 
 # dimension compatibility check
@@ -31,7 +31,7 @@ def avg_fade(im1, im2):
     returns new image
     """
     newim = np.round((im1*0.98 + im2 *0.02)/2)
-    newim = newim.astype(np.unint8)
+    newim = newim.astype(np.uint8)
     return newim
 
 # gets image1
