@@ -186,22 +186,22 @@
     dwemiBob(progress);
     if (dwemi.direction == 1) { //Facing right
       if (dwemi.blink) {
-        context.drawImage(document.getElementById('background1'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-        context.drawImage(document.getElementById('background2'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+        //context.drawImage(document.getElementById('background1'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+        //context.drawImage(document.getElementById('background2'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
         context.drawImage(dwemi.rightBlink, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
       } else {
-        context.drawImage(document.getElementById('background1'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-        context.drawImage(document.getElementById('background2'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+        //context.drawImage(document.getElementById('background1'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+        //context.drawImage(document.getElementById('background2'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
         context.drawImage(dwemi.right, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
       }
     } else { //facing left
       if (dwemi.blink) {
-        context.drawImage(document.getElementById('background1'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-        context.drawImage(document.getElementById('background2'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+        //context.drawImage(document.getElementById('background1'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+        //context.drawImage(document.getElementById('background2'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
         context.drawImage(dwemi.leftBlink, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
       } else {
-        context.drawImage(document.getElementById('background1'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
-        context.drawImage(document.getElementById('background2'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+        //context.drawImage(document.getElementById('background1'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
+        //context.drawImage(document.getElementById('background2'), dwemi.dx, dwemi.dy, dwemi.dw, dwemi.dh);
         context.drawImage(dwemi.left, dwemi.dx+dwemi.dw, dwemi.dy, -dwemi.dw, dwemi.dh);
       }
     }

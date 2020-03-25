@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pylab as plt
 from PIL import Image, ImageOps
 import time
-import scipy.misc
 
 IMAGE_SIZE = (400,400)
 BLOCK_SIZE = 5
@@ -47,5 +46,5 @@ im2 = im2[:, :, :3]
 
 newim = block_replace(im1, im2)
 
-scipy.misc.imsave('html/images/stomachImages/background.jpg', newim)
+newim.save('html/images/stomachImages/background.jpg')
 print("Done")

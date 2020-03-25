@@ -5,9 +5,10 @@
   "main": "server.js",
   "dependencies": {
     "express": "^4.16.4",
+    "express-cache-controller": "^1.1.0",
     "image-downloader": "^3.4.1",
     "js-base64": "^2.4.9",
-    "mongodb": "^3.1.8",
+    "mongodb": "^3.5.5",
     "socket.io": "^2.1.1",
     "uuid": "^3.3.2"
   },

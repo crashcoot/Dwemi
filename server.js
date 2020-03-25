@@ -1,5 +1,3 @@
-var mongo = require('mongodb');
-var MongoClient = require('mongodb').MongoClient;
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -9,12 +7,7 @@ var fs = require('fs');
 var cacheControl = require("express-cache-controller")
 const download = require('image-downloader');
 const { spawn } = require('child_process');
-
-var url = "mongodb://localhost:27017/dwemidb";
-MongoClient.connect(url, function(err, db) { //Not currently using this but will later
-  if (err) throw err;
-  var dbo = db.db("dwemidb");
-
+  
   const PORT = process.env.PORT || 8080;
 
   app.use(express.static('html'));
@@ -26,7 +19,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   });
   http.listen(8080, function(){});
 
-  setInterval(() => {let pyProg = spawn('python', ['dwemiimage.py']);}, 2000); //Runs the python script every 5 seconds
+  //setInterval(() => {let pyProg = spawn('python', ['dwemiimage.py']);}, 2000); //Runs the python script every 5 seconds
 
   var sockets = { };
   let interval; //To be used for looping through the sockets
@@ -188,7 +181,7 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   function searchImage(foodData) {
     query = JSON.parse(foodData);
     console.log(query)
-    let pyProg = spawn('python', ['dwemicrawler.py', query]);
+    //let pyProg = spawn('python', ['dwemicrawler.py', query]);
     setTimeout(function(){
       let imageData = fs.readFileSync("../dwemi/html/images/stomachImages/stomach.jpg", { encoding: 'base64' })
       upFood(imageData);
@@ -246,5 +239,3 @@ MongoClient.connect(url, function(err, db) { //Not currently using this but will
   function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
   }
-});
-
